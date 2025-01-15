@@ -1,15 +1,4 @@
-// Discordgo - Discord bindings for Go
-// Available at https://github.com/bwmarrin/discordgo
-
-// Copyright 2015-2016 Bruce Marriner <bruce@sqls.net>.  All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
-
-// This file contains variables for all known Discord end points.  All functions
-// throughout the Discordgo package use these variables for all connections
-// to Discord.  These are all exported and you may modify them if needed.
-
-package discordgo
+package web4app
 
 import "strconv"
 
@@ -39,7 +28,7 @@ var (
 	EndpointCDNAvatars      = EndpointCDN + "avatars/"
 	EndpointCDNIcons        = EndpointCDN + "icons/"
 	EndpointCDNSplashes     = EndpointCDN + "splashes/"
-	EndpointCDNChannelIcons = EndpointCDN + "channel-icons/"
+	EndpointCDNChannelIcons = EndpointCDN + "rooms-icons/"
 	EndpointCDNBanners      = EndpointCDN + "banners/"
 	EndpointCDNGuilds       = EndpointCDN + "guilds/"
 
@@ -62,7 +51,7 @@ var (
 	EndpointUserGuilds                    = func(uID string) string { return EndpointUsers + uID + "/guilds" }
 	EndpointUserGuild                     = func(uID, gID string) string { return EndpointUsers + uID + "/guilds/" + gID }
 	EndpointUserGuildMember               = func(uID, gID string) string { return EndpointUserGuild(uID, gID) + "/member" }
-	EndpointUserChannels                  = func(uID string) string { return EndpointUsers + uID + "/channels" }
+	EndpointUserChannels                  = func(uID string) string { return EndpointUsers + uID + "/rooms" }
 	EndpointUserApplicationRoleConnection = func(aID string) string { return EndpointUsers + "@me/applications/" + aID + "/role-connection" }
 	EndpointUserConnections               = func(uID string) string { return EndpointUsers + uID + "/connections" }
 
@@ -73,7 +62,7 @@ var (
 	EndpointGuildThreads             = func(gID string) string { return EndpointGuild(gID) + "/threads" }
 	EndpointGuildActiveThreads       = func(gID string) string { return EndpointGuildThreads(gID) + "/active" }
 	EndpointGuildPreview             = func(gID string) string { return EndpointGuilds + gID + "/preview" }
-	EndpointGuildChannels            = func(gID string) string { return EndpointGuilds + gID + "/channels" }
+	EndpointGuildChannels            = func(gID string) string { return EndpointGuilds + gID + "/rooms" }
 	EndpointGuildMembers             = func(gID string) string { return EndpointGuilds + gID + "/members" }
 	EndpointGuildMembersSearch       = func(gID string) string { return EndpointGuildMembers(gID) + "/search" }
 	EndpointGuildMember              = func(gID, uID string) string { return EndpointGuilds + gID + "/members/" + uID }
