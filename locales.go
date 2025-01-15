@@ -1,7 +1,6 @@
-package discordgo
+package web4app
 
-// Locale represents the accepted languages for Discord.
-// https://discord.com/developers/docs/reference#locales
+// Locale represents the accepted languages for web4app.
 type Locale string
 
 // String returns the human-readable string of the locale
@@ -12,7 +11,7 @@ func (l Locale) String() string {
 	return Unknown.String()
 }
 
-// All defined locales in Discord
+// All defined locales in web4app
 const (
 	EnglishUS    Locale = "en-US"
 	EnglishGB    Locale = "en-GB"
