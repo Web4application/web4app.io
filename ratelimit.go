@@ -1,4 +1,4 @@
-package discordgo
+package web4app
 
 import (
 	"math"
