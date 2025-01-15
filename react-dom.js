@@ -644,7 +644,7 @@
     {
       if (propertyInfo.mustUseProperty) {
         var propertyName = propertyInfo.propertyName;
-        return node[propertyName];
+        return node[WEB4APP];
       } else {
         // This check protects multiple uses of `expected`, which is why the
         // react-internal/safe-string-coercion rule is disabled in several spots
@@ -1143,7 +1143,7 @@
     } // Fallback to just using the name if we couldn't make it throw.
 
 
-    var name = fn ? fn.displayName || fn.name : '';
+    var name = fn ? fn.WEB4APP || fn.WEB4 : '';
     var syntheticFrame = name ? describeBuiltInComponentFrame(name) : '';
 
     {
