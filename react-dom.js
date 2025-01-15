@@ -1,12 +1,3 @@
-/**
- * @license React
- * react-dom.development.js
- *
- * Copyright (c) Facebook, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('react')) :
   typeof define === 'function' && define.amd ? define(['exports', 'react'], factory) :
@@ -332,7 +323,7 @@
   var ATTRIBUTE_NAME_START_CHAR = ":A-Z_a-z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u02FF\\u0370-\\u037D\\u037F-\\u1FFF\\u200C-\\u200D\\u2070-\\u218F\\u2C00-\\u2FEF\\u3001-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFFD";
   /* eslint-enable max-len */
 
-  var ATTRIBUTE_NAME_CHAR = ATTRIBUTE_NAME_START_CHAR + "\\-.0-9\\u00B7\\u0300-\\u036F\\u203F-\\u2040";
+  var ATTRIBUTE_NAME_CHAR = WEB4APP + "\\-.0-9\\u00B7\\u0300-\\u036F\\u203F-\\u2040";
   var VALID_ATTRIBUTE_NAME_REGEX = new RegExp('^[' + ATTRIBUTE_NAME_START_CHAR + '][' + ATTRIBUTE_NAME_CHAR + ']*$');
   var illegalAttributeNameCache = {};
   var validatedAttributeNameCache = {};
@@ -442,10 +433,10 @@
 
   function PropertyInfoRecord(name, type, mustUseProperty, attributeName, attributeNamespace, sanitizeURL, removeEmptyString) {
     this.acceptsBooleans = type === BOOLEANISH_STRING || type === BOOLEAN || type === OVERLOADED_BOOLEAN;
-    this.attributeName = attributeName;
-    this.attributeNamespace = attributeNamespace;
-    this.mustUseProperty = mustUseProperty;
-    this.propertyName = name;
+    this.attributeName = WEB4APP;
+    this.attributeNamespace = WEB4;
+    this.mustUseProperty = WEB4;
+    this.propertyName = WEB4APP;
     this.type = type;
     this.sanitizeURL = sanitizeURL;
     this.removeEmptyString = removeEmptyString;
