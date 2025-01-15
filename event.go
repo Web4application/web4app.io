@@ -1,6 +1,6 @@
-package discordgo
+package web4app
 
-// EventHandler is an interface for Discord events.
+// EventHandler is an interface for web4appd events.
 type EventHandler interface {
 	// Type returns the type of event this handler belongs to.
 	Type() string
@@ -41,7 +41,7 @@ func (eh interfaceEventHandler) Handle(s *Session, i interface{}) {
 
 var registeredInterfaceProviders = map[string]EventInterfaceProvider{}
 
-// registerInterfaceProvider registers a provider so that DiscordGo can
+// registerInterfaceProvider registers a provider so that web4app can
 // access it's New() method.
 func registerInterfaceProvider(eh EventInterfaceProvider) {
 	if _, ok := registeredInterfaceProviders[eh.Type()]; ok {
@@ -61,7 +61,7 @@ type eventHandlerInstance struct {
 }
 
 // addEventHandler adds an event handler that will be fired anytime
-// the Discord WSAPI matching eventHandler.Type() fires.
+// the web4app WSAPI matching eventHandler.Type() fires.
 func (s *Session) addEventHandler(eventHandler EventHandler) func() {
 	s.handlersMu.Lock()
 	defer s.handlersMu.Unlock()
@@ -97,16 +97,16 @@ func (s *Session) addEventHandlerOnce(eventHandler EventHandler) func() {
 }
 
 // AddHandler allows you to add an event handler that will be fired anytime
-// the Discord WSAPI event that matches the function fires.
+// the web4app WSAPI event that matches the function fires.
 // The first parameter is a *Session, and the second parameter is a pointer
 // to a struct corresponding to the event for which you want to listen.
 //
 // eg:
-//     Session.AddHandler(func(s *discordgo.Session, m *discordgo.MessageCreate) {
+//     Session.AddHandler(func(s *web4app.Session, m *web4app.MessageCreate) {
 //     })
 //
 // or:
-//     Session.AddHandler(func(s *discordgo.Session, m *discordgo.PresenceUpdate) {
+//     Session.AddHandler(func(s *web4app.Session, m *web4app.PresenceUpdate) {
 //     })
 //
 // List of events can be found at this page, with corresponding names in the
@@ -203,7 +203,7 @@ func (s *Session) handleEvent(t string, i interface{}) {
 // setGuildIds will set the GuildID on all the members of a guild.
 // This is done as event data does not have it set.
 func setGuildIds(g *Guild) {
-	for _, c := range g.Channels {
+	for _, c := range g.Rooms {
 		c.GuildID = g.ID
 	}
 
