@@ -1,17 +1,4 @@
-// Discordgo - Discord bindings for Go
-// Available at https://github.com/bwmarrin/discordgo
-
-// Copyright 2015-2016 Bruce Marriner <bruce@sqls.net>.  All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
-
-// This file contains high level helper functions and easy entry points for the
-// entire discordgo package.  These functions are being developed and are very
-// experimental at this point.  They will most likely change so please use the
-// low level functions if that's a problem.
-
-// Package discordgo provides Discord binding for Go
-package discordgo
+package web4app
 
 import (
 	"net/http"
@@ -21,10 +8,9 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-// VERSION of DiscordGo, follows Semantic Versioning. (http://semver.org/)
-const VERSION = "0.27.1"
+const VERSION = "1.27.1"
 
-// New creates a new Discord session with provided token.
+// New creates a new web4app session with provided token.
 // If the token is for a bot, it must be prefixed with "Bot "
 // 		e.g. "Bot ..."
 // Or if it is an OAuth2 token, it must be prefixed with "Bearer "
@@ -55,7 +41,7 @@ func New(token string) (s *Session, err error) {
 	s.Identify.Compress = true
 	s.Identify.LargeThreshold = 250
 	s.Identify.Properties.OS = runtime.GOOS
-	s.Identify.Properties.Browser = "DiscordGo v" + VERSION
+	s.Identify.Properties.Browser = "web4app v" + VERSION
 	s.Identify.Intents = IntentsAllWithoutPrivileged
 	s.Identify.Token = token
 	s.Token = token
