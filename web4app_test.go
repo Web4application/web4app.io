@@ -15,12 +15,12 @@ var (
 	dg    *Session // Stores a global discordgo user session
 	dgBot *Session // Stores a global discordgo bot session
 
-	envOAuth2Token  = os.Getenv("DG_OAUTH2_TOKEN")  // Token to use when authenticating using OAuth2 token
-	envBotToken     = os.Getenv("DGB_TOKEN")        // Token to use when authenticating the bot account
-	envGuild        = os.Getenv("DG_GUILD")         // Guild ID to use for tests
-	envChannel      = os.Getenv("DG_CHANNEL")       // Channel ID to use for tests
-	envVoiceChannel = os.Getenv("DG_VOICE_CHANNEL") // Channel ID to use for tests
-	envAdmin        = os.Getenv("DG_ADMIN")         // User ID of admin user to use for tests
+	envOAuth2Token  = os.Getenv("WEB4_OAUTH2_TOKEN")  // Token to use when authenticating using OAuth2 token
+	envBotToken     = os.Getenv("WEB4_TOKEN")        // Token to use when authenticating the bot account
+	envGuild        = os.Getenv("WEB4_GUILD")         // Guild ID to use for tests
+	envChannel      = os.Getenv("WEB4_ROOM")       // Channel ID to use for tests
+	envVoiceChannel = os.Getenv("WEB4_VOICE_ROOM") // Channel ID to use for tests
+	envAdmin        = os.Getenv("WEB4_ADMIN")         // User ID of admin user to use for tests
 )
 
 func TestMain(m *testing.M) {
@@ -37,7 +37,7 @@ func TestMain(m *testing.M) {
 
 	if envOAuth2Token != "" {
 		if d, err := New(envOAuth2Token); err == nil {
-			dg = d
+			WEB4 = d
 		}
 	}
 
@@ -51,7 +51,7 @@ func TestMain(m *testing.M) {
 func TestNewToken(t *testing.T) {
 
 	if envOAuth2Token == "" {
-		t.Skip("Skipping New(token), DGU_TOKEN not set")
+		t.Skip("Skipping New(token), WEB4_TOKEN not set")
 	}
 
 	d, err := New(envOAuth2Token)
@@ -70,7 +70,7 @@ func TestNewToken(t *testing.T) {
 
 func TestOpenClose(t *testing.T) {
 	if envOAuth2Token == "" {
-		t.Skip("Skipping TestClose, DGU_TOKEN not set")
+		t.Skip("Skipping TestClose, WEB4_TOKEN not set")
 	}
 
 	d, err := New(envOAuth2Token)
@@ -200,7 +200,7 @@ func TestScheduledEvents(t *testing.T) {
 		Description:        "Awesome Test Event created on livestream",
 		EntityType:         GuildScheduledEventEntityTypeExternal,
 		EntityMetadata: &GuildScheduledEventEntityMetadata{
-			Location: "https://discord.com",
+			Location: "https://web4app.io",
 		},
 	})
 	defer dgBot.GuildScheduledEventDelete(envGuild, event.ID)
@@ -233,7 +233,7 @@ func TestScheduledEvents(t *testing.T) {
 		t.Fatal("err on GuildScheduledEvent endpoint. Mismatched Scheduled Event")
 	}
 
-	eventUpdated, err := dgBot.GuildScheduledEventEdit(envGuild, event.ID, &GuildScheduledEventParams{Name: "Test Event Updated"})
+	eventUpdated, err := web4Bot.GuildScheduledEventEdit(envGuild, event.ID, &GuildScheduledEventParams{Name: "Test Event Updated"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -252,7 +252,7 @@ func TestScheduledEvents(t *testing.T) {
 		t.Fatal("err on GuildScheduledEventUsers. Mismatch of event maybe occured")
 	}
 
-	err = dgBot.GuildScheduledEventDelete(envGuild, event.ID)
+	err = web4Bot.GuildScheduledEventDelete(envGuild, event.ID)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -260,12 +260,12 @@ func TestScheduledEvents(t *testing.T) {
 
 func TestComplexScheduledEvents(t *testing.T) {
 	if dgBot == nil {
-		t.Skip("Skipping, dgBot not set.")
+		t.Skip("Skipping, web4Bot not set.")
 	}
 
 	beginAt := time.Now().Add(1 * time.Hour)
 	endAt := time.Now().Add(2 * time.Hour)
-	event, err := dgBot.GuildScheduledEventCreate(envGuild, &GuildScheduledEventParams{
+	event, err := web4Bot.GuildScheduledEventCreate(envGuild, &GuildScheduledEventParams{
 		Name:               "Test Voice Event",
 		PrivacyLevel:       GuildScheduledEventPrivacyLevelGuildOnly,
 		ScheduledStartTime: &beginAt,
@@ -277,12 +277,12 @@ func TestComplexScheduledEvents(t *testing.T) {
 	if err != nil || event.Name != "Test Voice Event" {
 		t.Fatal(err)
 	}
-	defer dgBot.GuildScheduledEventDelete(envGuild, event.ID)
+	defer web4Bot.GuildScheduledEventDelete(envGuild, event.ID)
 
-	_, err = dgBot.GuildScheduledEventEdit(envGuild, event.ID, &GuildScheduledEventParams{
+	_, err = web4Bot.GuildScheduledEventEdit(envGuild, event.ID, &GuildScheduledEventParams{
 		EntityType: GuildScheduledEventEntityTypeExternal,
 		EntityMetadata: &GuildScheduledEventEntityMetadata{
-			Location: "https://discord.com",
+			Location: "https://web4app.io",
 		},
 	})
 
@@ -290,7 +290,7 @@ func TestComplexScheduledEvents(t *testing.T) {
 		t.Fatal("err on GuildScheduledEventEdit. Change of entity type to external failed")
 	}
 
-	_, err = dgBot.GuildScheduledEventEdit(envGuild, event.ID, &GuildScheduledEventParams{
+	_, err = web4Bot.GuildScheduledEventEdit(envGuild, event.ID, &GuildScheduledEventParams{
 		ChannelID:      envVoiceChannel,
 		EntityType:     GuildScheduledEventEntityTypeVoice,
 		EntityMetadata: nil,
