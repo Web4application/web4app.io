@@ -17,7 +17,7 @@ const (
 	UserSelectMenuComponent        ComponentType = 5
 	RoleSelectMenuComponent        ComponentType = 6
 	MentionableSelectMenuComponent ComponentType = 7
-	ChannelSelectMenuComponent     ComponentType = 8
+	chatroomSelectMenuComponent     ComponentType = 8
 )
 
 // MessageComponent is a base interface for all message components.
@@ -183,7 +183,7 @@ const (
 	UserSelectMenu        = SelectMenuType(UserSelectMenuComponent)
 	RoleSelectMenu        = SelectMenuType(RoleSelectMenuComponent)
 	MentionableSelectMenu = SelectMenuType(MentionableSelectMenuComponent)
-	ChannelSelectMenu     = SelectMenuType(ChannelSelectMenuComponent)
+	chatroomlSelectMenu     = SelectMenuType(ChannelSelectMenuComponent)
 )
 
 // SelectMenu represents select menu component.
@@ -203,7 +203,7 @@ type SelectMenu struct {
 	Disabled  bool               `json:"disabled"`
 
 	// NOTE: Can only be used in SelectMenu with Channel menu type.
-	ChannelTypes []ChannelType `json:"channel_types,omitempty"`
+	chatroomTypes []ChannelType `json:"chatroom_types,omitempty"`
 }
 
 // Type is a method to get the type of a component.
