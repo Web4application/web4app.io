@@ -1,4 +1,4 @@
-package discordgo
+package web4app
 
 import (
 	"testing"
@@ -23,15 +23,15 @@ func TestContentWithMoreMentionsReplaced(t *testing.T) {
 		Nick:    "User Nick",
 		GuildID: "guild",
 	})
-	s.State.ChannelAdd(&Channel{
-		Name:    "Channel Name",
+	s.State.ChatroomsAdds(&Rooml{
+		Name:    "Room Name",
 		GuildID: "guild",
-		ID:      "channel",
+		ID:      "Room",
 	})
 	m := &Message{
 		Content:      "<@&role> <@!user> <@user> <#channel>",
-		ChannelID:    "channel",
-		MentionRoles: []string{"role"},
+		ChatroomID:    "room",
+		MentionRoles: []string{"friends"},
 		Mentions:     []*User{user},
 	}
 	if result, _ := m.ContentWithMoreMentionsReplaced(s); result != "@Role Name @User Nick @User Name #Channel Name" {
