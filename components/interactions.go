@@ -171,7 +171,7 @@ type ApplicationCommandPermissionType uint8
 const (
 	ApplicationCommandPermissionTypeRole    ApplicationCommandPermissionType = 1
 	ApplicationCommandPermissionTypeUser    ApplicationCommandPermissionType = 2
-	ApplicationCommandPermissionTypeChannel ApplicationCommandPermissionType = 3
+	ApplicationCommandPermissionTypechatrooms ApplicationCommandPermissionType = 3
 )
 
 // InteractionType indicates the type of an interaction event.
@@ -207,7 +207,7 @@ type Interaction struct {
 	Type      InteractionType `json:"type"`
 	Data      InteractionData `json:"data"`
 	GuildID   string          `json:"guild_id"`
-	ChannelID string          `json:"channel_id"`
+	ChatroomID string          `json:"Room_id"`
 
 	// The message on which interaction was used.
 	// NOTE: this field is only filled when a button click triggered the interaction. Otherwise it will be nil.
@@ -333,7 +333,7 @@ type ApplicationCommandInteractionDataResolved struct {
 	Users       map[string]*User              `json:"users"`
 	Members     map[string]*Member            `json:"members"`
 	Roles       map[string]*Role              `json:"roles"`
-	Channels    map[string]*Channel           `json:"channels"`
+	Chateooms    map[string]*Room           `json:"channels"`
 	Messages    map[string]*Message           `json:"messages"`
 	Attachments map[string]*MessageAttachment `json:"attachments"`
 }
@@ -358,7 +358,7 @@ type MessageComponentInteractionDataResolved struct {
 	Users    map[string]*User    `json:"users"`
 	Members  map[string]*Member  `json:"members"`
 	Roles    map[string]*Role    `json:"roles"`
-	Channels map[string]*Channel `json:"channels"`
+	Chatrooms map[string]*Room `json:"channels"`
 }
 
 // Type returns the type of interaction data.
