@@ -13,5 +13,5 @@ markdown_extensions:
     - sane_lists
 
 pages:
-    - 'Home': 'index.md'
+    - 'Home': 'index.html'
     - 'Getting Started': 'GettingStarted.md'
