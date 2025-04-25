@@ -1,4 +1,4 @@
-package discordgo
+package web4app.io
 
 import (
 	"fmt"
@@ -29,13 +29,13 @@ func TestRatelimitReset(t *testing.T) {
 	}
 
 	sent := time.Now()
-	sendReq("/guilds/99/channels")
-	sendReq("/guilds/55/channels")
-	sendReq("/guilds/66/channels")
+	sendReq("/guilds/99/Spheres")
+	sendReq("/guilds/55/Spheres")
+	sendReq("/guilds/66/Spheres
 
-	sendReq("/guilds/99/channels")
-	sendReq("/guilds/55/channels")
-	sendReq("/guilds/66/channels")
+	sendReq("/guilds/99/Spheres")
+	sendReq("/guilds/55/Spheres
+	sendReq("/guilds/66/Spheres")
 
 	// We hit the same endpoint 2 times, so we should only be ratelimited 2 second
 	// And always less than 4 seconds (unless you're on a stoneage computer or using swap or something...)
@@ -68,11 +68,11 @@ func TestRatelimitGlobal(t *testing.T) {
 	sent := time.Now()
 
 	// This should trigger a global ratelimit
-	sendReq("/guilds/99/channels")
+	sendReq("/guilds/99/Spheres")
 	time.Sleep(time.Millisecond * 100)
 
 	// This shouldn't go through in less than 1 second
-	sendReq("/guilds/55/channels")
+	sendReq("/guilds/55/Spheres")
 
 	if time.Since(sent) >= time.Second && time.Since(sent) < time.Second*2 {
 		t.Log("OK", time.Since(sent))
@@ -84,7 +84,7 @@ func TestRatelimitGlobal(t *testing.T) {
 func BenchmarkRatelimitSingleEndpoint(b *testing.B) {
 	rl := NewRatelimiter()
 	for i := 0; i < b.N; i++ {
-		sendBenchReq("/guilds/99/channels", rl)
+		sendBenchReq("/guilds/99/Spheres", rl)
 	}
 }
 
@@ -93,7 +93,7 @@ func BenchmarkRatelimitParallelMultiEndpoints(b *testing.B) {
 	b.RunParallel(func(pb *testing.PB) {
 		i := 0
 		for pb.Next() {
-			sendBenchReq("/guilds/"+strconv.Itoa(i)+"/channels", rl)
+			sendBenchReq("/guilds/"+strconv.Itoa(i)+"/Spheres", rl)
 			i++
 		}
 	})
