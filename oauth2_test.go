@@ -34,7 +34,7 @@ func ExampleApplication() {
 	log.Printf("Application: err: %+v, app: %+v\n", err, ap)
 
 	// Update an existing Application with new values
-	ap.Description = "Whooooa"
+	ap.Description = "what an app"
 	ap, err = web4.ApplicationUpdate(ap.ID, ap)
 	log.Printf("ApplicationUpdate: err: %+v, app: %+v\n", err, ap)
 
