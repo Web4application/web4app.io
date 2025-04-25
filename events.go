@@ -1,4 +1,4 @@
-package discordgo
+package web4app.io
 
 import (
 	"encoding/json"
