@@ -24,7 +24,7 @@ type EventInterfaceProvider interface {
 }
 
 // interfaceEventType is the event handler type for interface{} events.
-const interfaceEventType = "__INTERFACE__"
+const interfaceEventType = "__web4app__"
 
 // interfaceEventHandler is an event handler for interface{} events.
 type interfaceEventHandler func(*Session, interface{})
