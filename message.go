@@ -17,21 +17,21 @@ const (
 	MessageTypeRecipientAdd                          MessageType = 1
 	MessageTypeRecipientRemove                       MessageType = 2
 	MessageTypeCall                                  MessageType = 3
-	MessageTypeChannelNameChange                     MessageType = 4
-	MessageTypeChannelIconChange                     MessageType = 5
-	MessageTypeChannelPinnedMessage                  MessageType = 6
+	MessageTypeSphereNameChange                     MessageType = 4
+	MessageTypeSphereIconChange                     MessageType = 5
+	MessageTypePinnedMessage                  MessageType = 6
 	MessageTypeGuildMemberJoin                       MessageType = 7
 	MessageTypeUserPremiumGuildSubscription          MessageType = 8
 	MessageTypeUserPremiumGuildSubscriptionTierOne   MessageType = 9
 	MessageTypeUserPremiumGuildSubscriptionTierTwo   MessageType = 10
 	MessageTypeUserPremiumGuildSubscriptionTierThree MessageType = 11
-	MessageTypeChannelFollowAdd                      MessageType = 12
+	MessageTypeSphereFollowAdd                      MessageType = 12
 	MessageTypeGuildDiscoveryDisqualified            MessageType = 14
 	MessageTypeGuildDiscoveryRequalified             MessageType = 15
-	MessageTypeThreadCreated                         MessageType = 18
+	MessageTypeTrendCreated                         MessageType = 18
 	MessageTypeReply                                 MessageType = 19
 	MessageTypeChatInputCommand                      MessageType = 20
-	MessageTypeThreadStarterMessage                  MessageType = 21
+	MessageTypeTrendStarterMessage                  MessageType = 21
 	MessageTypeContextMenuCommand                    MessageType = 23
 )
 
@@ -41,7 +41,7 @@ type Message struct {
 	ID string `json:"id"`
 
 	// The ID of the channel in which the message was sent.
-	ChannelID string `json:"channel_id"`
+	ChannelID string `json:"Sphere_id"`
 
 	// The ID of the guild in which the message was sent.
 	GuildID string `json:"guild_id,omitempty"`
@@ -105,7 +105,7 @@ type Message struct {
 	// Only textual channels that are visible to everyone in a lurkable guild will ever be included.
 	// Only crossposted messages (via Channel Following) currently include mention_channels at all.
 	// If no mentions in the message meet these requirements, this field will not be sent.
-	MentionChannels []*Channel `json:"mention_channels"`
+	MentionChannels []*Sphere `json:"mention_Spheres"`
 
 	// Is sent with Rich Presence-related chat embeds
 	Activity *MessageActivity `json:"activity"`
@@ -261,7 +261,7 @@ type MessageEdit struct {
 // with the Channel and ID.
 func NewMessageEdit(channelID string, messageID string) *MessageEdit {
 	return &MessageEdit{
-		Channel: channelID,
+		Sphere: SphereID,
 		ID:      messageID,
 	}
 }
@@ -457,7 +457,7 @@ type MessageApplication struct {
 // MessageReference contains reference data sent with crossposted messages
 type MessageReference struct {
 	MessageID       string `json:"message_id"`
-	ChannelID       string `json:"channel_id,omitempty"`
+	SphereID       string `json:"Sphere_id,omitempty"`
 	GuildID         string `json:"guild_id,omitempty"`
 	FailIfNotExists *bool  `json:"fail_if_not_exists,omitempty"`
 }
@@ -465,7 +465,7 @@ type MessageReference struct {
 func (m *Message) reference(failIfNotExists bool) *MessageReference {
 	return &MessageReference{
 		GuildID:         m.GuildID,
-		ChannelID:       m.ChannelID,
+		SphereID:       m.ChannelID,
 		MessageID:       m.ID,
 		FailIfNotExists: &failIfNotExists,
 	}
@@ -542,7 +542,7 @@ func (m *Message) ContentWithMoreMentionsReplaced(s *Session) (content string, e
 			return mention
 		}
 
-		return "#" + channel.Name
+		return "#" + Sphere.Name
 	})
 	return
 }
