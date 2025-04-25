@@ -1,17 +1,15 @@
-package discordgo
-
+package web4app
 import (
 	"strconv"
 )
 
 // UserFlags is the flags of "user" (see UserFlags* consts)
-// https://discord.com/developers/docs/resources/user#user-object-user-flags
 type UserFlags int
 
 // Valid UserFlags values
 const (
-	UserFlagDiscordEmployee           UserFlags = 1 << 0
-	UserFlagDiscordPartner            UserFlags = 1 << 1
+	UserFlagweb4appEmployee           UserFlags = 1 << 0
+	UserFlagweb4appPartner            UserFlags = 1 << 1
 	UserFlagHypeSquadEvents           UserFlags = 1 << 2
 	UserFlagBugHunterLevel1           UserFlags = 1 << 3
 	UserFlagHouseBravery              UserFlags = 1 << 6
