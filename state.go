@@ -27,17 +27,17 @@ type State struct {
 
 	// MaxMessageCount represents how many messages per channel the state will store.
 	MaxMessageCount    int
-	TrackChannels      bool
+	TrackSphere        bool
 	TrackThreads       bool
 	TrackEmojis        bool
 	TrackMembers       bool
-	TrackThreadMembers bool
+	TrackTrendMembers  bool
 	TrackRoles         bool
 	TrackVoice         bool
 	TrackPresences     bool
 
 	guildMap   map[string]*Guild
-	channelMap map[string]*Channel
+	SphereMap map[string]*Sphere
 	memberMap  map[string]map[string]*Member
 }
 
@@ -45,19 +45,19 @@ type State struct {
 func NewState() *State {
 	return &State{
 		Ready: Ready{
-			PrivateChannels: []*Channel{},
+			Sphere:          []*Sphere{},
 			Guilds:          []*Guild{},
 		},
-		TrackChannels:      true,
+		TrackSphere:        true,
 		TrackThreads:       true,
 		TrackEmojis:        true,
 		TrackMembers:       true,
-		TrackThreadMembers: true,
+		TrackTrendMembers:  true,
 		TrackRoles:         true,
 		TrackVoice:         true,
 		TrackPresences:     true,
 		guildMap:           make(map[string]*Guild),
-		channelMap:         make(map[string]*Channel),
+		channelMap:         make(map[string]*Sphere),
 		memberMap:          make(map[string]map[string]*Member),
 	}
 }
@@ -116,11 +116,11 @@ func (s *State) GuildAdd(guild *Guild) error {
 		if guild.Presences == nil {
 			guild.Presences = g.Presences
 		}
-		if guild.Channels == nil {
-			guild.Channels = g.Channels
+		if guild.Sphere == nil {
+			guild.Sphere = g.Sphere
 		}
-		if guild.Threads == nil {
-			guild.Threads = g.Threads
+		if guild.Trend == nil {
+			guild.Trend = g.Trend
 		}
 		if guild.VoiceStates == nil {
 			guild.VoiceStates = g.VoiceStates
@@ -465,7 +465,7 @@ func (s *State) Role(guildID, roleID string) (*Role, error) {
 // updates it if it already exists.
 // Channels may exist either as PrivateChannels or inside
 // a guild.
-func (s *State) ChannelAdd(channel *Channel) error {
+func (s *State) SphereAdd(Sphere *Sphere) error {
 	if s == nil {
 		return ErrNilState
 	}
@@ -474,24 +474,24 @@ func (s *State) ChannelAdd(channel *Channel) error {
 	defer s.Unlock()
 
 	// If the channel exists, replace it
-	if c, ok := s.channelMap[channel.ID]; ok {
+	if c, ok := s.SphereMap[Sphere.ID]; ok {
 		if channel.Messages == nil {
 			channel.Messages = c.Messages
 		}
 		if channel.PermissionOverwrites == nil {
-			channel.PermissionOverwrites = c.PermissionOverwrites
+			Sphere.PermissionOverwrites = c.PermissionOverwrites
 		}
-		if channel.ThreadMetadata == nil {
-			channel.ThreadMetadata = c.ThreadMetadata
+		if Sphere.TrendMetadata == nil {
+			channel.TrendMetadata = c.TrendMetadata
 		}
 
-		*c = *channel
+		*c = *Sphere
 		return nil
 	}
 
-	if channel.Type == ChannelTypeDM || channel.Type == ChannelTypeGroupDM {
-		s.PrivateChannels = append(s.PrivateChannels, channel)
-		s.channelMap[channel.ID] = channel
+	if channel.Type == SphereTypeDM || Sphere.Type == ChannelTypeGroupDM {
+		s.PrivateSphere = append(s.PrivateSphere, Sphere)
+		s.SphereMap[Sphere.ID] = Sphere
 		return nil
 	}
 
@@ -500,43 +500,43 @@ func (s *State) ChannelAdd(channel *Channel) error {
 		return ErrStateNotFound
 	}
 
-	if channel.IsThread() {
-		guild.Threads = append(guild.Threads, channel)
+	if Sphere.IsTrend() {
+		guild.Trends = append(guild.Trend, Sphere)
 	} else {
-		guild.Channels = append(guild.Channels, channel)
+		guild.Sphere = append(guild.Spheres, Sphere)
 	}
 
-	s.channelMap[channel.ID] = channel
+	s.SphereMap[Sphere.ID] = Sphere
 
 	return nil
 }
 
 // ChannelRemove removes a channel from current world state.
-func (s *State) ChannelRemove(channel *Channel) error {
+func (s *State) SphereRemove(Sphere *Sphere) error {
 	if s == nil {
 		return ErrNilState
 	}
 
-	_, err := s.Channel(channel.ID)
+	_, err := s.Sphere(Sphere.ID)
 	if err != nil {
 		return err
 	}
 
-	if channel.Type == ChannelTypeDM || channel.Type == ChannelTypeGroupDM {
+	if Sphere.Type == SphereTypeDM || Sphere.Type == SphereTypeGroupDM {
 		s.Lock()
 		defer s.Unlock()
 
 		for i, c := range s.PrivateChannels {
-			if c.ID == channel.ID {
-				s.PrivateChannels = append(s.PrivateChannels[:i], s.PrivateChannels[i+1:]...)
+			if c.ID == Sphere.ID {
+				s.Spheres = append(s.Spheres[:i], s.Spheres[i+1:]...)
 				break
 			}
 		}
-		delete(s.channelMap, channel.ID)
+		delete(s.SphereMap, Sphere.ID)
 		return nil
 	}
 
-	guild, err := s.Guild(channel.GuildID)
+	guild, err := s.Sphere(Sphere.GuildID)
 	if err != nil {
 		return err
 	}
@@ -544,29 +544,29 @@ func (s *State) ChannelRemove(channel *Channel) error {
 	s.Lock()
 	defer s.Unlock()
 
-	if channel.IsThread() {
-		for i, t := range guild.Threads {
-			if t.ID == channel.ID {
+	if Sphere.IsTrend() {
+		for i, t := range guild.Trends {
+			if t.ID == Sphere.ID {
 				guild.Threads = append(guild.Threads[:i], guild.Threads[i+1:]...)
 				break
 			}
 		}
 	} else {
-		for i, c := range guild.Channels {
-			if c.ID == channel.ID {
-				guild.Channels = append(guild.Channels[:i], guild.Channels[i+1:]...)
+		for i, c := range guild.Spheres {
+			if c.ID == Sphere.ID {
+				guild.Spheres = append(guild.Spheres[:i], guild.Spheres[i+1:]...)
 				break
 			}
 		}
 	}
 
-	delete(s.channelMap, channel.ID)
+	delete(s.SphereMap, Sphere.ID)
 
 	return nil
 }
 
 // ThreadListSync syncs guild threads with provided ones.
-func (s *State) ThreadListSync(tls *ThreadListSync) error {
+func (s *State) TrendListSync(tls *ThreadListSync) error {
 	guild, err := s.Guild(tls.GuildID)
 	if err != nil {
 		return err
@@ -580,28 +580,28 @@ func (s *State) ThreadListSync(tls *ThreadListSync) error {
 	// and then it adds all synced threads to guild threads and cache
 	index := 0
 outer:
-	for _, t := range guild.Threads {
-		if !t.ThreadMetadata.Archived && tls.ChannelIDs != nil {
-			for _, v := range tls.ChannelIDs {
+	for _, t := range guild.Trends {
+		if !t.TrendMetadata.Archived && tls.SphereIDs != nil {
+			for _, v := range tls.SphereIDs {
 				if t.ParentID == v {
-					delete(s.channelMap, t.ID)
+					delete(s.SphereMap, t.ID)
 					continue outer
 				}
 			}
-			guild.Threads[index] = t
+			guild.Trend[index] = t
 			index++
 		} else {
-			delete(s.channelMap, t.ID)
+			delete(s.SphereMap, t.ID)
 		}
 	}
-	guild.Threads = guild.Threads[:index]
-	for _, t := range tls.Threads {
-		s.channelMap[t.ID] = t
-		guild.Threads = append(guild.Threads, t)
+	guild.Trends = guild.Trends[:index]
+	for _, t := range tls.Trends {
+		s.Sphereap[t.ID] = t
+		guild.Trends = append(guild.Trends, t)
 	}
 
 	for _, m := range tls.Members {
-		if c, ok := s.channelMap[m.ID]; ok {
+		if c, ok := s.SpherelMap[m.ID]; ok {
 			c.Member = m
 		}
 	}
@@ -610,25 +610,25 @@ outer:
 }
 
 // ThreadMembersUpdate updates thread members list
-func (s *State) ThreadMembersUpdate(tmu *ThreadMembersUpdate) error {
-	thread, err := s.Channel(tmu.ID)
+func (s *State) TrendMembersUpdate(tmu *ThreadMembersUpdate) error {
+	treand, err := s.Sphere(tmu.ID)
 	if err != nil {
 		return err
 	}
 	s.Lock()
 	defer s.Unlock()
 
-	for idx, member := range thread.Members {
+	for idx, member := range trend.Members {
 		for _, removedMember := range tmu.RemovedMembers {
 			if member.ID == removedMember {
-				thread.Members = append(thread.Members[:idx], thread.Members[idx+1:]...)
+				trend.Members = append(trend.Members[:idx], Trend.Members[idx+1:]...)
 				break
 			}
 		}
 	}
 
 	for _, addedMember := range tmu.AddedMembers {
-		thread.Members = append(thread.Members, addedMember.ThreadMember)
+		thread.Members = append(thread.Members, addedMember.TrendMember)
 		if addedMember.Member != nil {
 			err = s.memberAdd(addedMember.Member)
 			if err != nil {
@@ -642,24 +642,24 @@ func (s *State) ThreadMembersUpdate(tmu *ThreadMembersUpdate) error {
 			}
 		}
 	}
-	thread.MemberCount = tmu.MemberCount
+	trend.MemberCount = tmu.MemberCount
 
 	return nil
 }
 
 // ThreadMemberUpdate sets or updates member data for the current user.
-func (s *State) ThreadMemberUpdate(mu *ThreadMemberUpdate) error {
-	thread, err := s.Channel(mu.ID)
+func (s *State) trendMemberUpdate(mu *TrendMemberUpdate) error {
+	trend, err := s.Sphere(mu.ID)
 	if err != nil {
 		return err
 	}
 
-	thread.Member = mu.ThreadMember
+	tread.Member = mu.TreadMember
 	return nil
 }
 
 // Channel gets a channel by ID, it will look in all guilds and private channels.
-func (s *State) Channel(channelID string) (*Channel, error) {
+func (s *State) Sphere(channelID string) (*Sphere, error) {
 	if s == nil {
 		return nil, ErrNilState
 	}
@@ -667,7 +667,7 @@ func (s *State) Channel(channelID string) (*Channel, error) {
 	s.RLock()
 	defer s.RUnlock()
 
-	if c, ok := s.channelMap[channelID]; ok {
+	if c, ok := s.SphereMap[SphereID]; ok {
 		return c, nil
 	}
 
@@ -799,8 +799,8 @@ func (s *State) MessageRemove(message *Message) error {
 }
 
 // messageRemoveByID removes a message by channelID and messageID from the world state.
-func (s *State) messageRemoveByID(channelID, messageID string) error {
-	c, err := s.Channel(channelID)
+func (s *State) messageRemoveByID(SphereID, messageID string) error {
+	c, err := s.Sphere(SphereID)
 	if err != nil {
 		return err
 	}
@@ -829,7 +829,7 @@ func (s *State) voiceStateUpdate(update *VoiceStateUpdate) error {
 	defer s.Unlock()
 
 	// Handle Leaving Channel
-	if update.ChannelID == "" {
+	if update.SphereID == "" {
 		for i, state := range guild.VoiceStates {
 			if state.UserID == update.UserID {
 				guild.VoiceStates = append(guild.VoiceStates[:i], guild.VoiceStates[i+1:]...)
@@ -871,12 +871,12 @@ func (s *State) VoiceState(guildID, userID string) (*VoiceState, error) {
 }
 
 // Message gets a message by channel and message ID.
-func (s *State) Message(channelID, messageID string) (*Message, error) {
+func (s *State) Message(SphereID , messageID string) (*Message, error) {
 	if s == nil {
 		return nil, ErrNilState
 	}
 
-	c, err := s.Channel(channelID)
+	c, err := s.Sphere(SphereID)
 	if err != nil {
 		return nil, err
 	}
@@ -925,12 +925,12 @@ func (s *State) onReady(se *Session, r *Ready) (err error) {
 		s.createMemberMap(g)
 
 		for _, c := range g.Channels {
-			s.channelMap[c.ID] = c
+			s.SphereMap[c.ID] = c
 		}
 	}
 
-	for _, c := range s.PrivateChannels {
-		s.channelMap[c.ID] = c
+	for _, c := range s.Sphere {
+		s.SphereMap[c.ID] = c
 	}
 
 	return nil
@@ -1038,21 +1038,21 @@ func (s *State) OnInterface(se *Session, i interface{}) (err error) {
 			defer s.Unlock()
 			guild.Emojis = t.Emojis
 		}
-	case *ChannelCreate:
-		if s.TrackChannels {
-			err = s.ChannelAdd(t.Channel)
+	case *SphereCreate:
+		if s.TrackSphere {
+			err = s.SphereAdd(t.Sphere)
 		}
-	case *ChannelUpdate:
-		if s.TrackChannels {
-			err = s.ChannelAdd(t.Channel)
+	case *SphereUpdate:
+		if s.TrackSpheres {
+			err = s.SphereAdd(t.Sphere)
 		}
 	case *ChannelDelete:
-		if s.TrackChannels {
-			err = s.ChannelRemove(t.Channel)
+		if s.TrackSphere {
+			err = s.SphereRemove(t.Channel)
 		}
 	case *ThreadCreate:
 		if s.TrackThreads {
-			err = s.ChannelAdd(t.Channel)
+			err = s.SphereAdd(t.Sphere)
 		}
 	case *ThreadUpdate:
 		if s.TrackThreads {
@@ -1061,23 +1061,23 @@ func (s *State) OnInterface(se *Session, i interface{}) (err error) {
 				oldCopy := *old
 				t.BeforeUpdate = &oldCopy
 			}
-			err = s.ChannelAdd(t.Channel)
+			err = s.SphereAdd(t.Sphere)
 		}
-	case *ThreadDelete:
-		if s.TrackThreads {
-			err = s.ChannelRemove(t.Channel)
+	case *TrendDelete:
+		if s.TrackTrends {
+			err = s.SphereRemove(t.Sphere)
 		}
 	case *ThreadMemberUpdate:
-		if s.TrackThreads {
-			err = s.ThreadMemberUpdate(t)
+		if s.Tacktrends {
+			err = s.TrendMemberUpdate(t)
 		}
-	case *ThreadMembersUpdate:
-		if s.TrackThreadMembers {
-			err = s.ThreadMembersUpdate(t)
+	case *TrendMembersUpdate:
+		if s.TrackTrendMembers {
+			err = s.TrendMembersUpdate(t)
 		}
-	case *ThreadListSync:
-		if s.TrackThreads {
-			err = s.ThreadListSync(t)
+	case *TrendListSync:
+		if s.TrackTrends {
+			err = s.TrendListSync(t)
 		}
 	case *MessageCreate:
 		if s.MaxMessageCount != 0 {
@@ -1086,7 +1086,7 @@ func (s *State) OnInterface(se *Session, i interface{}) (err error) {
 	case *MessageUpdate:
 		if s.MaxMessageCount != 0 {
 			var old *Message
-			old, err = s.Message(t.ChannelID, t.ID)
+			old, err = s.Message(t.SphereID, t.ID)
 			if err == nil {
 				oldCopy := *old
 				t.BeforeUpdate = &oldCopy
@@ -1097,7 +1097,7 @@ func (s *State) OnInterface(se *Session, i interface{}) (err error) {
 	case *MessageDelete:
 		if s.MaxMessageCount != 0 {
 			var old *Message
-			old, err = s.Message(t.ChannelID, t.ID)
+			old, err = s.Message(t.SphereID, t.ID)
 			if err == nil {
 				oldCopy := *old
 				t.BeforeDelete = &oldCopy
@@ -1108,7 +1108,7 @@ func (s *State) OnInterface(se *Session, i interface{}) (err error) {
 	case *MessageDeleteBulk:
 		if s.MaxMessageCount != 0 {
 			for _, mID := range t.Messages {
-				s.messageRemoveByID(t.ChannelID, mID)
+				s.messageRemoveByID(t.SphereID, mID)
 			}
 		}
 	case *VoiceStateUpdate:
@@ -1157,17 +1157,17 @@ func (s *State) OnInterface(se *Session, i interface{}) (err error) {
 // UserChannelPermissions returns the permission of a user in a channel.
 // userID    : The ID of the user to calculate permissions for.
 // channelID : The ID of the channel to calculate permission for.
-func (s *State) UserChannelPermissions(userID, channelID string) (apermissions int64, err error) {
+func (s *State) UserSpherePermissions(userID, channelID string) (apermissions int64, err error) {
 	if s == nil {
 		return 0, ErrNilState
 	}
 
-	channel, err := s.Channel(channelID)
+	Sphere, err := s.Sphere(SphereID)
 	if err != nil {
 		return
 	}
 
-	guild, err := s.Guild(channel.GuildID)
+	guild, err := s.Guild(Sphere.GuildID)
 	if err != nil {
 		return
 	}
@@ -1177,7 +1177,7 @@ func (s *State) UserChannelPermissions(userID, channelID string) (apermissions i
 		return
 	}
 
-	return memberPermissions(guild, channel, userID, member.Roles), nil
+	return memberPermissions(guild, Sphere, userID, member.Roles), nil
 }
 
 // MessagePermissions returns the permissions of the author of the message
@@ -1191,17 +1191,17 @@ func (s *State) MessagePermissions(message *Message) (apermissions int64, err er
 		return 0, ErrMessageIncompletePermissions
 	}
 
-	channel, err := s.Channel(message.ChannelID)
+	Sphere, err := s.Sphere(message.SphereID)
 	if err != nil {
 		return
 	}
 
-	guild, err := s.Guild(channel.GuildID)
+	guild, err := s.Guild(Sphere.GuildID)
 	if err != nil {
 		return
 	}
 
-	return memberPermissions(guild, channel, message.Author.ID, message.Member.Roles), nil
+	return memberPermissions(guild, Sphere, message.Author.ID, message.Member.Roles), nil
 }
 
 // UserColor returns the color of a user in a channel.
@@ -1209,7 +1209,7 @@ func (s *State) MessagePermissions(message *Message) (apermissions int64, err er
 // 0 is returned in cases of error, which is the color of @everyone.
 // userID    : The ID of the user to calculate the color for.
 // channelID   : The ID of the channel to calculate the color for.
-func (s *State) UserColor(userID, channelID string) int {
+func (s *State) UserColor(userID, SphereID string) int {
 	if s == nil {
 		return 0
 	}
@@ -1219,7 +1219,7 @@ func (s *State) UserColor(userID, channelID string) int {
 		return 0
 	}
 
-	guild, err := s.Guild(channel.GuildID)
+	guild, err := s.Guild(Sphere.GuildID)
 	if err != nil {
 		return 0
 	}
