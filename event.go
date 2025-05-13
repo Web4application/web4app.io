@@ -1,247 +1,134 @@
 package web4app
 
-// EventHandler is an interface for web4appd events.
+import (
+	"fmt"
+	"sync"
+)
+
+// EventHandler is an interface for handling specific events.
 type EventHandler interface {
-	// Type returns the type of event this handler belongs to.
+	// Type returns the type of the event this handler handles.
 	Type() string
 
-	// Handle is called whenever an event of Type() happens.
-	// It is the receivers responsibility to type assert that the interface
-	// is the expected struct.
+	// Handle processes the event when triggered.
 	Handle(*Session, interface{})
 }
 
-// EventInterfaceProvider is an interface for providing empty interfaces for
-// Discord events.
+// EventInterfaceProvider is an interface that provides an instance for an event.
 type EventInterfaceProvider interface {
-	// Type is the type of event this handler belongs to.
+	// Type returns the event type.
 	Type() string
 
-	// New returns a new instance of the struct this event handler handles.
-	// This is called once per event.
-	// The struct is provided to all handlers of the same Type().
+	// New returns a new instance of the struct for the event.
 	New() interface{}
 }
 
-// interfaceEventType is the event handler type for interface{} events.
+// interfaceEventType is a constant used to represent generic interface{} events.
 const interfaceEventType = "__web4app__"
 
-// interfaceEventHandler is an event handler for interface{} events.
-type interfaceEventHandler func(*Session, interface{})
-
-// Type returns the event type for interface{} events.
-func (eh interfaceEventHandler) Type() string {
-	return interfaceEventType
+// Session manages the WebSocket session, event handlers, and state.
+type Session struct {
+	handlers     map[string][]EventHandler
+	onceHandlers map[string][]EventHandler
+	handlersMu   sync.RWMutex
+	SyncEvents   bool
 }
 
-// Handle is the handler for an interface{} event.
-func (eh interfaceEventHandler) Handle(s *Session, i interface{}) {
-	eh(s, i)
-}
-
-var registeredInterfaceProviders = map[string]EventInterfaceProvider{}
-
-// registerInterfaceProvider registers a provider so that web4app can
-// access it's New() method.
-func registerInterfaceProvider(eh EventInterfaceProvider) {
-	if _, ok := registeredInterfaceProviders[eh.Type()]; ok {
-		return
-		// XXX:
-		// if we should error here, we need to do something with it.
-		// fmt.Errorf("event %s already registered", eh.Type())
+// NewSession creates a new Session.
+func NewSession() *Session {
+	return &Session{
+		handlers:     make(map[string][]EventHandler),
+		onceHandlers: make(map[string][]EventHandler),
 	}
-	registeredInterfaceProviders[eh.Type()] = eh
-	return
 }
 
-// eventHandlerInstance is a wrapper around an event handler, as functions
-// cannot be compared directly.
-type eventHandlerInstance struct {
-	eventHandler EventHandler
-}
-
-// addEventHandler adds an event handler that will be fired anytime
-// the web4app WSAPI matching eventHandler.Type() fires.
-func (s *Session) addEventHandler(eventHandler EventHandler) func() {
+// AddHandler adds a persistent event handler.
+func (s *Session) AddHandler(handler EventHandler) func() {
 	s.handlersMu.Lock()
 	defer s.handlersMu.Unlock()
 
-	if s.handlers == nil {
-		s.handlers = map[string][]*eventHandlerInstance{}
-	}
+	// Add the handler to the handlers map
+	s.handlers[handler.Type()] = append(s.handlers[handler.Type()], handler)
 
-	ehi := &eventHandlerInstance{eventHandler}
-	s.handlers[eventHandler.Type()] = append(s.handlers[eventHandler.Type()], ehi)
-
+	// Return a function to remove the handler
 	return func() {
-		s.removeEventHandlerInstance(eventHandler.Type(), ehi)
+		s.removeEventHandler(handler.Type(), handler)
 	}
 }
 
-// addEventHandler adds an event handler that will be fired the next time
-// the Discord WSAPI matching eventHandler.Type() fires.
-func (s *Session) addEventHandlerOnce(eventHandler EventHandler) func() {
+// AddHandlerOnce adds an event handler that fires only once.
+func (s *Session) AddHandlerOnce(handler EventHandler) func() {
 	s.handlersMu.Lock()
 	defer s.handlersMu.Unlock()
 
-	if s.onceHandlers == nil {
-		s.onceHandlers = map[string][]*eventHandlerInstance{}
-	}
+	// Add the handler to the onceHandlers map
+	s.onceHandlers[handler.Type()] = append(s.onceHandlers[handler.Type()], handler)
 
-	ehi := &eventHandlerInstance{eventHandler}
-	s.onceHandlers[eventHandler.Type()] = append(s.onceHandlers[eventHandler.Type()], ehi)
-
+	// Return a function to remove the handler
 	return func() {
-		s.removeEventHandlerInstance(eventHandler.Type(), ehi)
+		s.removeEventHandlerOnce(handler.Type(), handler)
 	}
 }
 
-// AddHandler allows you to add an event handler that will be fired anytime
-// the web4app WSAPI event that matches the function fires.
-// The first parameter is a *Session, and the second parameter is a pointer
-// to a struct corresponding to the event for which you want to listen.
-//
-// eg:
-//     Session.AddHandler(func(s *web4app.Session, m *web4app.MessageCreate) {
-//     })
-//
-// or:
-//     Session.AddHandler(func(s *web4app.Session, m *web4app.PresenceUpdate) {
-//     })
-//
-// List of events can be found at this page, with corresponding names in the
-// library for each event: https://discord.com/developers/docs/topics/gateway#event-names
-// There are also synthetic events fired by the library internally which are
-// available for handling, like Connect, Disconnect, and RateLimit.
-// events.go contains all of the Discord WSAPI and synthetic events that can be handled.
-//
-// The return value of this method is a function, that when called will remove the
-// event handler.
-func (s *Session) AddHandler(handler interface{}) func() {
-	eh := handlerForInterface(handler)
-
-	if eh == nil {
-		s.log(LogError, "Invalid handler type, handler will never be called")
-		return func() {}
-	}
-
-	return s.addEventHandler(eh)
-}
-
-// AddHandlerOnce allows you to add an event handler that will be fired the next time
-// the Discord WSAPI event that matches the function fires.
-// See AddHandler for more details.
-func (s *Session) AddHandlerOnce(handler interface{}) func() {
-	eh := handlerForInterface(handler)
-
-	if eh == nil {
-		s.log(LogError, "Invalid handler type, handler will never be called")
-		return func() {}
-	}
-
-	return s.addEventHandlerOnce(eh)
-}
-
-// removeEventHandler instance removes an event handler instance.
-func (s *Session) removeEventHandlerInstance(t string, ehi *eventHandlerInstance) {
+// removeEventHandler removes a persistent event handler.
+func (s *Session) removeEventHandler(t string, handler EventHandler) {
 	s.handlersMu.Lock()
 	defer s.handlersMu.Unlock()
 
 	handlers := s.handlers[t]
-	for i := range handlers {
-		if handlers[i] == ehi {
+	for i := 0; i < len(handlers); i++ {
+		if handlers[i] == handler {
 			s.handlers[t] = append(handlers[:i], handlers[i+1:]...)
-		}
-	}
-
-	onceHandlers := s.onceHandlers[t]
-	for i := range onceHandlers {
-		if onceHandlers[i] == ehi {
-			s.onceHandlers[t] = append(onceHandlers[:i], onceHandlers[i+1:]...)
+			return
 		}
 	}
 }
 
-// Handles calling permanent and once handlers for an event type.
-func (s *Session) handle(t string, i interface{}) {
-	for _, eh := range s.handlers[t] {
+// removeEventHandlerOnce removes a one-time event handler.
+func (s *Session) removeEventHandlerOnce(t string, handler EventHandler) {
+	s.handlersMu.Lock()
+	defer s.handlersMu.Unlock()
+
+	handlers := s.onceHandlers[t]
+	for i := 0; i < len(handlers); i++ {
+		if handlers[i] == handler {
+			s.onceHandlers[t] = append(handlers[:i], handlers[i+1:]...)
+			return
+		}
+	}
+}
+
+// DispatchEvent triggers all registered handlers for a specific event type.
+func (s *Session) DispatchEvent(t string, data interface{}) {
+	s.handlersMu.RLock()
+	defer s.handlersMu.RUnlock()
+
+	// Call all persistent handlers
+	for _, handler := range s.handlers[t] {
 		if s.SyncEvents {
-			eh.eventHandler.Handle(s, i)
+			handler.Handle(s, data)
 		} else {
-			go eh.eventHandler.Handle(s, i)
+			go handler.Handle(s, data)
 		}
 	}
 
-	if len(s.onceHandlers[t]) > 0 {
-		for _, eh := range s.onceHandlers[t] {
+	// Call all one-time handlers and then remove them
+	if handlers, ok := s.onceHandlers[t]; ok {
+		for _, handler := range handlers {
 			if s.SyncEvents {
-				eh.eventHandler.Handle(s, i)
+				handler.Handle(s, data)
 			} else {
-				go eh.eventHandler.Handle(s, i)
+				go handler.Handle(s, data)
 			}
 		}
+		// Clear once handlers after they are fired
 		s.onceHandlers[t] = nil
 	}
 }
 
-// Handles an event type by calling internal methods, firing handlers and firing the
-// interface{} event.
-func (s *Session) handleEvent(t string, i interface{}) {
-	s.handlersMu.RLock()
-	defer s.handlersMu.RUnlock()
-
-	// All events are dispatched internally first.
-	s.onInterface(i)
-
-	// Then they are dispatched to anyone handling interface{} events.
-	s.handle(interfaceEventType, i)
-
-	// Finally they are dispatched to any typed handlers.
-	s.handle(t, i)
-}
-
-// setGuildIds will set the GuildID on all the members of a guild.
-// This is done as event data does not have it set.
-func setGuildIds(g *Guild) {
-	for _, c := range g.Rooms {
-		c.GuildID = g.ID
-	}
-
-	for _, m := range g.Members {
-		m.GuildID = g.ID
-	}
-
-	for _, vs := range g.VoiceStates {
-		vs.GuildID = g.ID
-	}
-}
-
-// onInterface handles all internal events and routes them to the appropriate internal handler.
-func (s *Session) onInterface(i interface{}) {
-	switch t := i.(type) {
-	case *Ready:
-		for _, g := range t.Guilds {
-			setGuildIds(g)
-		}
-		s.onReady(t)
-	case *GuildCreate:
-		setGuildIds(t.Guild)
-	case *GuildUpdate:
-		setGuildIds(t.Guild)
-	case *VoiceServerUpdate:
-		go s.onVoiceServerUpdate(t)
-	case *VoiceStateUpdate:
-		go s.onVoiceStateUpdate(t)
-	}
-	err := s.State.OnInterface(s, i)
-	if err != nil {
-		s.log(LogDebug, "error dispatching internal event, %s", err)
-	}
-}
-
-// onReady handles the ready event.
-func (s *Session) onReady(r *Ready) {
-
-	// Store the SessionID within the Session struct.
-	s.sessionID = r.SessionID
+// EventHandlerFactory creates handlers for specific events.
+func EventHandlerFactory(eventType string, handler EventHandler) EventInterfaceProvider {
+	// A factory for generating event handlers can be implemented here.
+	// This can be expanded to create handlers based on specific event data types.
+	return nil // Placeholder for future implementation
 }
