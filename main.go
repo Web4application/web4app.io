@@ -2,54 +2,52 @@ package main
 
 import (
 	"fmt"
+	"github.com/gorilla/websocket"
 	"log"
-	"os"
-
-	"github.com/bwmarrin/discordgo"
+	"net/http"
+	"time"
+	"golang.org/x/crypto/acme/autocert"
 )
 
-// Replace with your bot token from Discord Developer Portal
-var token = "MTIwODM4MDQwOTgxNDE4ODA0Mg.GufPW0.G5hGQ93fQrlbTodsc7iL_9RKow7l8u2gEXazKQ"
-
-// Function to handle when the bot is ready
-func onReady(s *discordgo.Session, event *discordgo.Ready) {
-	fmt.Println("Bot is now running. Press CTRL+C to exit.")
+// Define a WebSocket upgrader to handle connections
+var upgrader = websocket.Upgrader{
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
 }
 
-// Function to handle messages
-func onMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
-	// Ignore messages from the bot itself
-	if m.Author.ID == s.State.User.ID {
+func handleWebSocket(w http.ResponseWriter, r *http.Request) {
+	// Upgrade HTTP request to WebSocket
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Println("Error upgrading to WebSocket:", err)
 		return
 	}
+	defer conn.Close()
 
-	// Respond to a specific command
-	if m.Content == "!hello" {
-		s.ChannelMessageSend(m.ChannelID, "Hello, world!")
+	// Send a greeting message every 5 seconds
+	for {
+		message := fmt.Sprintf("Hello at %s", time.Now().Format(time.RFC1123))
+		err := conn.WriteMessage(websocket.TextMessage, []byte(message))
+		if err != nil {
+			log.Println("Error sending message:", err)
+			break
+		}
+		time.Sleep(5 * time.Second)
 	}
 }
 
 func main() {
-	// Create a new Discord session using the provided bot token
-	dg, err := discordgo.New("Bot " + token)
-	if err != nil {
-		fmt.Println("error creating Discord session,", err)
-		return
+	// Use TLS with autocert (ACME certificate management)
+	certManager := autocert.Manager{
+		Prompt:     autocert.AcceptTOS,
+		HostPolicy: autocert.HostWhitelist("localhost"), // Replace with your domain
+		Cache:      autocert.DirCache("/tmp/certs"),
 	}
 
-	// Register message handler
-	dg.AddMessageCreate(onMessage)
-	dg.AddReadyHandler(onReady)
-
-	// Open a websocket connection to Discord and begin listening
-	err = dg.Open()
-	if err != nil {
-		fmt.Println("error opening connection,", err)
-		return
-	}
-	defer dg.Close()
-
-	// Wait for the bot to be shut down (CTRL+C)
-	fmt.Println("Bot is running. Press CTRL+C to exit.")
-	select {}
-}
+	// Register the WebSocket handler
+	http.HandleFunc("/ws", handleWebSocket)
+	
+	// Start the HTTPS server with the generated certificates
+	log.Println("Secure WebSocket server started at wss://localhost:8080/ws")
+	log.Fatal(http.ListenAndServeTLS(":8080", "", "", &certManager))
