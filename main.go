@@ -57,5 +57,5 @@ func main() {
         c.JSON(200, gin.H{"sentiment": sentiment})
     })
 
-    r.Run(":8080") // Run on port 8080
+    r.Run(":5432") // Run on port 3000
 }
