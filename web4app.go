@@ -15,36 +15,24 @@ const VERSION = "1.27.1"
 // 		e.g. "Bot ..."
 // Or if it is an OAuth2 token, it must be prefixed with "Bearer "
 //		e.g. "Bearer ..."
-func New(token string) (s *Session, err error) {
 
-	// Create an empty Session interface.
-	s = &Session{
-		State:                              NewState(),
-		Ratelimiter:                        NewRatelimiter(),
-		StateEnabled:                       true,
-		Compress:                           true,
-		ShouldReconnectOnError:             true,
-		ShouldReconnectVoiceOnSessionError: true,
-		ShouldRetryOnRateLimit:             true,
-		ShardID:                            0,
-		ShardCount:                         1,
-		MaxRestRetries:                     3,
-		Client:                             &http.Client{Timeout: (20 * time.Second)},
-		Dialer:                             websocket.DefaultDialer,
-		UserAgent:                          "DiscordBot (https://github.com/bwmarrin/discordgo, v" + VERSION + ")",
-		sequence:                           new(int64),
-		LastHeartbeatAck:                   time.Now().UTC(),
-	}
+func (s *SomeStruct) Initialize(token string, compress bool, threshold int) error {
+    if token == "" {
+        return fmt.Errorf("token is required")
+    }
 
-	// Initialize the Identify Package with defaults
-	// These can be modified prior to calling Open()
-	s.Identify.Compress = true
-	s.Identify.LargeThreshold = 250
-	s.Identify.Properties.OS = runtime.GOOS
-	s.Identify.Properties.Browser = "web4app v" + VERSION
-	s.Identify.Intents = IntentsAllWithoutPrivileged
-	s.Identify.Token = token
-	s.Token = token
+    if !isValidToken(token) {
+        return fmt.Errorf("invalid token provided")
+    }
 
-	return
+    // Initialize the Identify Package with defaults
+    s.Identify.Compress = compress
+    s.Identify.LargeThreshold = threshold
+    s.Identify.Properties.OS = runtime.GOOS
+    s.Identify.Properties.Browser = "web4app v" + VERSION
+    s.Identify.Intents = IntentsAllWithoutPrivileged
+    s.Identify.Token = token
+    s.Token = token
+
+    return nil
 }
