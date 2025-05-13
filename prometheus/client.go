@@ -24,5 +24,5 @@ func IncrementAPIRequest(endpoint string) {
 
 func ExposeMetrics() {
     http.Handle("/metrics", promhttp.Handler())
-    go http.ListenAndServe(":9090", nil)
+    go http.ListenAndServe(":3000", nil)
 }
