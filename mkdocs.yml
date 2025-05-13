@@ -3,7 +3,7 @@ site_author: kubu lee
 site_url: 
 repo_url: https://github.com/web4application/web4app.io
 
-dev_addr: 0.0.0.0:8000
+dev_addr: web4app.io:5000
 theme: yeti
 
 markdown_extensions:
