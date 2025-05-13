@@ -1,0 +1,13 @@
+<!-- Example HTML Trigger -->
+
+<button onclick="sendMessageToDiscord()">Send Message</button>
+
+<script>
+  async function sendMessageToDiscord() {
+    await fetch('/send-discord-message', {
+      method: 'POST',
+      body: JSON.stringify({ message: 'Hello from web4app.io!' }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+</script>
