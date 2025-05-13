@@ -9,7 +9,7 @@ const port = 3000;
 app.use(bodyParser.json()); // To parse JSON request bodies
 
 // Webhook URL - replace this with your actual webhook URL from Discord
-const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1262587975582089276/0yb7BZaAfjLplEOQSQxR23_ETlbiR5wVpLyrddSITqFsulyABp_OQ466MPhVMVYwbNUi';
+const DISCORD_WEBHOOK_URL = 'https://discord.com/oauth2/authorize?client_id=1169709827145089064&permissions=8&response_type=code&redirect_uri=https%3A%2F%2Fdiscord.com%2Foauth2%2Fauthorize%3Fclient_id%3D1208380409814188042&integration_type=0&scope=bot+webhook.incoming+identify+applications.commands.permissions.update+applications.store.update+applications.commands+applications.builds.read+applications.builds.upload+email+connections+guilds+activities.write+presences.write+openid+gateway.connect+payment_sources.country_code';
 
 async function sendWebhookMessage(message) {
   try {
