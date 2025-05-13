@@ -1,61 +1,55 @@
 package main
 
 import (
-    "my_project/handlers"
-    "my_project/services"
+	"fmt"
+	"log"
+	"os"
 
-    "github.com/gin-gonic/gin"
+	"github.com/bwmarrin/discordgo"
 )
 
+// Replace with your bot token from Discord Developer Portal
+var token = "MTIwODM4MDQwOTgxNDE4ODA0Mg.GufPW0.G5hGQ93fQrlbTodsc7iL_9RKow7l8u2gEXazKQ"
+
+// Function to handle when the bot is ready
+func onReady(s *discordgo.Session, event *discordgo.Ready) {
+	fmt.Println("Bot is now running. Press CTRL+C to exit.")
+}
+
+// Function to handle messages
+func onMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
+	// Ignore messages from the bot itself
+	if m.Author.ID == s.State.User.ID {
+		return
+	}
+
+	// Respond to a specific command
+	if m.Content == "!hello" {
+		s.ChannelMessageSend(m.ChannelID, "Hello, world!")
+	}
+}
+
 func main() {
-    r := gin.Default()
+	// Create a new Discord session using the provided bot token
+	dg, err := discordgo.New("Bot " + token)
+	if err != nil {
+		fmt.Println("error creating Discord session,", err)
+		return
+	}
 
-    // WebSocket Endpoint
-    r.GET("/ws", func(c *gin.Context) {
-        handlers.WebSocketHandler(c.Writer, c.Request)
-    })
+	// Register message handler
+	dg.AddMessageCreate(onMessage)
+	dg.AddReadyHandler(onReady)
 
-    // Logging Middleware
-    r.Use(func(c *gin.Context) {
-        handlers.LoggingMiddleware(c.Writer, c.Request)
-        c.Next()
-    })
+	// Open a websocket connection to Discord and begin listening
+	err = dg.Open()
+	if err != nil {
+		fmt.Println("error opening connection,", err)
+		return
+	}
+	defer dg.Close()
 
-    // Fraud Detection Endpoint
-    r.POST("/fraud", func(c *gin.Context) {
-        type Request struct {
-            Amount float64 `json:"amount"`
-            IP     string  `json:"ip"`
-        }
-        var req Request
-        if err := c.BindJSON(&req); err != nil {
-            c.JSON(400, gin.H{"error": err.Error()})
-            return
-        }
-        isFraud := services.IsFraudulentTransaction(req.Amount, req.IP)
-        c.JSON(200, gin.H{"isFraud": isFraud})
-    })
-
-    // Recommendations Endpoint
-    r.GET("/recommendations/:userID", func(c *gin.Context) {
-        userID := c.Param("userID")
-        recommendations := services.GetRecommendations(userID)
-        c.JSON(200, gin.H{"recommendations": recommendations})
-    })
-
-    // Sentiment Analysis Endpoint
-    r.POST("/sentiment", func(c *gin.Context) {
-        type Request struct {
-            Text string `json:"text"`
-        }
-        var req Request
-        if err := c.BindJSON(&req); err != nil {
-            c.JSON(400, gin.H{"error": err.Error()})
-            return
-        }
-        sentiment := services.AnalyzeSentiment(req.Text)
-        c.JSON(200, gin.H{"sentiment": sentiment})
-    })
-
-    r.Run(":5432") // Run on port 3000
+	// Wait for the bot to be shut down (CTRL+C)
+	fmt.Println("Bot is running. Press CTRL+C to exit.")
+	select {}
 }
