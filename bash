@@ -128,3 +128,11 @@ case "$command" in
   fi
   ;;
 esac
+
+# Initialize Go module if needed
+go mod init web4app
+go mod tidy
+
+# Build and run locally
+go build -o web4app main.go
+./web4app
