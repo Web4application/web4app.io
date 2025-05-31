@@ -51,3 +51,17 @@ func main() {
 	// Start the HTTPS server with the generated certificates
 	log.Println("Secure WebSocket server started at wss://localhost:8080/ws")
 	log.Fatal(http.ListenAndServeTLS(":8080", "", "", &certManager))
+
+func main() {
+    // Serve static HTML/CSS/JS
+    fs := http.FileServer(http.Dir("./static"))
+    http.Handle("/", fs)
+
+    port := ":8080"
+    log.Println("Serving on http://localhost" + port)
+    err := http.ListenAndServe(port, nil)
+    if err != nil {
+        log.Fatal(err)
+    }
+}
+	
