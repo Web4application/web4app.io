@@ -136,3 +136,5 @@ go mod tidy
 # Build and run locally
 go build -o web4app main.go
 ./web4app
+docker build -t web4app .
+docker run -p 8080:8080 --env-file .env web4app
