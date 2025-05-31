@@ -138,3 +138,6 @@ go build -o web4app main.go
 ./web4app
 docker build -t web4app .
 docker run -p 8080:8080 --env-file .env web4app
+npm install -g netlify-cli
+netlify init
+netlify deploy --prod
