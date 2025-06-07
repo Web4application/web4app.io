@@ -1,5 +1,4 @@
-
-app = "web4app"
+app = "web4app.io"
 
 [build]
   dockerfile = "Dockerfile"
