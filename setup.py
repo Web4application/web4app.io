@@ -3,7 +3,7 @@ import re
 
 def derive_version() -> str:
     version = ''
-    with open('web4app/__init__.py') as f:
+    with open('web4app.io/__init__.py') as f:
         version = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', f.read(), re.MULTILINE).group(1)
 
     if not version:
