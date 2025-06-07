@@ -1,5 +1,4 @@
-package discordgo
-
+package web4app.io
 import (
 	"bytes"
 	"crypto/ed25519"
