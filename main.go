@@ -2,23 +2,24 @@
 package main
 
 import (
-    "log"
-    "net/http"
-    "os"
+	"log"
+	"net/http"
+	"web4app.io/api"
 )
 
 func main() {
-    port := os.Getenv("PORT")
-    if port == "" {
-        port = "8080"
-    }
+	mux := http.NewServeMux()
 
-    fs := http.FileServer(http.Dir("./static"))
-    http.Handle("/", fs)
+	// Serve static files from /public
+	fs := http.FileServer(http.Dir("./public"))
+	mux.Handle("/", fs)
 
-    log.Printf("Serving static files on http://localhost:%s\n", port)
-    err := http.ListenAndServe(":" + port, nil)
-    if err != nil {
-        log.Fatal("Server failed:", err)
-    }
+	// API routes
+	mux.HandleFunc("/api/hello", api.HelloHandler)
+
+	log.Println("Starting server on :8080")
+	err := http.ListenAndServe(":8080", mux)
+	if err != nil {
+		log.Fatal("Server failed: ", err)
+	}
 }
