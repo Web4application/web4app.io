@@ -1,0 +1,24 @@
+<!-- dashboard.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Web4 Dashboard</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <h2>Web4 DApp Dashboard</h2>
+
+  <div id="wallet-section">
+    <button onclick="connectWallet()">Connect Wallet</button>
+    <p id="wallet-address"></p>
+  </div>
+
+  <div class="card">
+    <h3>FDAK Balance</h3>
+    <p id="balance">0 FDAK</p>
+    <button onclick="getBalance()">Refresh</button>
+  </div>
+
+  <script src="web4/logic.js"></script>
+</body>
+</html>
