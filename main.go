@@ -1,25 +1,37 @@
-
 package main
 
 import (
-	"log"
-	"net/http"
-	"web4app.io/api"
+    "encoding/json"
+    "fmt"
+    "net/http"
+    "time"
 )
 
 func main() {
-	mux := http.NewServeMux()
+    http.Handle("/", http.FileServer(http.Dir("./static")))
+    http.HandleFunc("/api/hello", helloHandler)
+    http.HandleFunc("/api/time", timeHandler)
+    http.HandleFunc("/api/echo", echoHandler)
+    http.HandleFunc("/api/status", statusHandler)
 
-	// Serve static files from /public
-	fs := http.FileServer(http.Dir("./public"))
-	mux.Handle("/", fs)
+    fmt.Println("Server is running at http://localhost:8080")
+    http.ListenAndServe(":8080", nil)
+}
 
-	// API routes
-	mux.HandleFunc("/api/hello", api.HelloHandler)
+func helloHandler(w http.ResponseWriter, r *http.Request) {
+    json.NewEncoder(w).Encode(map[string]string{"message": "Hello from Go 🚀"})
+}
 
-	log.Println("Starting server on :8080")
-	err := http.ListenAndServe(":8080", mux)
-	if err != nil {
-		log.Fatal("Server failed: ", err)
-	}
+func timeHandler(w http.ResponseWriter, r *http.Request) {
+    json.NewEncoder(w).Encode(map[string]string{"time": time.Now().UTC().Format(time.RFC3339)})
+}
+
+func echoHandler(w http.ResponseWriter, r *http.Request) {
+    var body map[string]string
+    json.NewDecoder(r.Body).Decode(&body)
+    json.NewEncoder(w).Encode(map[string]string{"echo": body["text"]})
+}
+
+func statusHandler(w http.ResponseWriter, r *http.Request) {
+    json.NewEncoder(w).Encode(map[string]string{"status": "ok", "uptime": "10s"})
 }
