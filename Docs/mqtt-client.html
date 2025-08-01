@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Web4 Modular MQTT Dashboard</title>
+  <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #f9f9f9; color: #333; transition: background 0.3s, color 0.3s; }
+    header { background: #333; color: #fff; padding: 1rem; text-align: center; }
+    nav { display: flex; justify-content: center; background: #eee; padding: 10px; }
+    nav button { margin: 0 10px; padding: 10px 20px; cursor: pointer; border: none; background: #007acc; color: #fff; border-radius: 5px; }
+    nav button:hover { background: #005fa3; }
+    section { display: none; padding: 2rem; max-width: 900px; margin: auto; }
+    section.active { display: block; }
+    #messages { background: #fff; border: 1px solid #ccc; padding: 10px; height: 200px; overflow-y: auto; margin-bottom: 15px; }
+    input, button { padding: 8px; margin: 5px; }
+    canvas { background: #fff; border: 1px solid #ccc; margin-top: 10px; }
+    #alertBox { color: red; font-weight: bold; margin-top: 10px; }
+    .theme-toggle { position: fixed; top: 10px; right: 10px; cursor: pointer; }
+    .dark-mode { background: #1e1e1e; color: #eee; }
+    .dark-mode header { background: #111; }
+    .dark-mode nav { background: #222; }
+    .dark-mode #messages, .dark-mode canvas { background: #333; border-color: #555; }
+    footer { text-align: center; font-size: 0.9rem; color: #888; margin: 2rem 0; }
+  </style>
+</head>
+<body onload="initDashboard()">
+
+  <header>
+    <h1>📘 Web4 Modular MQTT Dashboard</h1>
+    <p>Built and maintained by kubu lee</p>
+  </header>
+
+  <div class="theme-toggle" onclick="toggleTheme()">🌓</div>
+
+  <nav>
+    <button onclick="showTab('docs')">📘 Docs</button>
+    <button onclick="showTab('mqtt')">🔌 MQTT Panel</button>
+    <button onclick="showTab('donate')">💰 Donate</button>
+  </nav>
+
+  <section id="docs">
+    <h2>Documentation Index</h2>
+    <ul>
+      <li><a href="overview.md">Project Overview</a></li>
+      <li><a href="services.md">Service Architecture</a></li>
+      <li><a href="deploy.md">Deployment Guide</a></li>
+      <li><a href="security.md">Security Practices</a></li>
+    </ul>
+    <p>To contribute or sponsor this work, see the <a href="../LICENSE.txt">license</a>.</p>
+  </section>
+
+  <section id="mqtt">
+    <h2>🔌 MQTT Client Panel</h2>
+    <div id="alertBox"></div>
+    <div id="messages"><p><em>Waiting for messages...</em></p></div>
+    <input type="text" id="topicInput" value="machine_topic" placeholder="Topic" />
+    <input type="text" id="messageInput" value="Hello from Web4!" placeholder="Message" />
+    <button onclick="sendMessage()">Send</button>
+    <canvas id="mqttChart" width="600" height="250"></canvas>
+  </section>
+
+  <section id="donate">
+    <h2>💰 Support Web4</h2>
+    <p>If you’d like to support this project, consider donating via cryptocurrency:</p>
+    <a href="https://nowpayments.io/donation?api_key=829719d1-9989-47d5-93b2-70c54c02ce16" target="_blank" rel="noreferrer noopener">
+      <img src="https://nowpayments.io/images/embeds/donation-button-white.svg" alt="Cryptocurrency & Bitcoin donation button by NOWPayments">
+    </a>
+  </section>
+
+  <footer>
+    &copy; 2025 Web4-Main. All rights reserved.
+  </footer>
+
+  <script>
+    let client, logData = [], darkMode = false;
+
+    const ctx = document.getElementById('mqttChart').getContext('2d');
+    const mqttChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [{
+          label: 'Sensor Data',
+          data: [],
+          borderColor: 'rgb(255,99,132)',
+          fill: false
+        }]
+      }
+    });
+
+    function initDashboard() {
+      showTab(localStorage.getItem('activeTab') || 'docs');
+      connectMQTT();
+    }
+
+    function showTab(id) {
+      ['docs', 'mqtt', 'donate'].forEach(tab => {
+        document.getElementById(tab).classList.toggle('active', tab === id);
+      });
+      localStorage.setItem('activeTab', id);
+    }
+
+    function toggleTheme() {
+      darkMode = !darkMode;
+      document.body.classList.toggle('dark-mode', darkMode);
+    }
+
+    function connectMQTT() {
+      client = mqtt.connect('wss://pf-f8i70zck04uhfsacjqga.cedalo.cloud:443/mqtt');
+      client.on('connect', () => {
+        console.log('MQTT Connected');
+        client.subscribe('machine_topic', () => logMessage('📡 Subscribed to <strong>machine_topic</strong>'));
+      });
+
+      client.on('message', (topic, msg) => {
+        const text = msg.toString();
+        const time = new Date().toLocaleTimeString();
+        logMessage(`[${time}] 📥 <strong>${topic}</strong>: ${text}`);
+        logData.push(`${new Date().toISOString()},${topic},${text}`);
+
+        const value = parseFloat(text);
+        mqttChart.data.labels.push(time);
+        mqttChart.data.datasets[0].data.push(value || 0);
+        mqttChart.update();
+
+        const alertBox = document.getElementById('alertBox');
+        if (value > 80) {
+          alertBox.innerText = `⚠️ Alert: High value detected (${value})`;
+        } else {
+          alertBox.innerText = '';
+        }
+
+        if (value < 30) {
+          client.publish('alerts', `Low value warning: ${value}`);
+        }
+      });
+
+      client.on('error', err => logMessage(`<span style="color:red;">Error:</span> ${err.message}`));
+      window.addEventListener('beforeunload', () => client.end());
+    }
+
+    function sendMessage() {
+      const topic = document.getElementById('topicInput').value;
+      const message = document.getElementById('messageInput').value;
+      client.publish(topic, message);
+      logMessage(`[${new Date().toLocaleTimeString()}] 📤 Sent to <strong>${topic}</strong>: ${message}`);
+    }
+
+    function logMessage(msg) {
+      const log = document.getElementById('messages');
+      const p = document.createElement('p');
+      p.innerHTML = msg;
+      log.appendChild(p);
+      log.scrollTop = log.scrollHeight;
+    }
+  </script>
+</body>
+</html>
