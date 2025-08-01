@@ -2,19 +2,38 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Web4App.io</title>
+  <title>Web4App.io – React Version</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 </head>
 <body>
-  <h1>🌐 Welcome to Web4App.io</h1>
-  <p>This is your Go-powered full-stack server.</p>
+  <div id="root"></div>
+
+  <!-- ✅ React and ReactDOM CDN -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+
   <script>
-    fetch("/api/hello")
-      .then(res => res.json())
-      .then(data => {
-        const msg = document.createElement("p");
-        msg.innerText = "API says: " + data.message;
-        document.body.appendChild(msg);
-      });
+    const { useEffect, useState } = React;
+
+    function App() {
+      const [message, setMessage] = useState(null);
+
+      useEffect(() => {
+        fetch("/api/hello")
+          .then(res => res.json())
+          .then(data => setMessage(data.message));
+      }, []);
+
+      return React.createElement(
+        'div',
+        { style: { fontFamily: 'sans-serif', textAlign: 'center', paddingTop: '50px' } },
+        React.createElement('h1', null, '🌐 Welcome to Web4App.io'),
+        React.createElement('p', null, 'This is your Go-powered full-stack server.'),
+        message && React.createElement('p', null, 'API says: ' + message)
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
   </script>
 </body>
 </html>
