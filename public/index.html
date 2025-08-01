@@ -2,28 +2,27 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Web4App.io - React App</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Web4App.io – Decentralized AI meets Web4 infrastructure." />
-  <link rel="icon" href="/favicon.ico" />
+  <title>Web4App.io – React Minimal App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Web4App.io – React + Web4 infrastructure" />
+  <link rel="icon" href="./favicon.ico" />
 </head>
 <body>
   <div id="root"></div>
 
-  <!-- ✅ React + ReactDOM from CDN -->
+  <!-- ✅ React CDN -->
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 
-  <!-- ✅ Your main React App -->
+  <!-- ✅ App Script -->
   <script>
     const e = React.createElement;
 
-    const App = () => {
-      return e('div', { style: { fontFamily: 'sans-serif', textAlign: 'center', marginTop: '50px' } },
-        e('h1', null, '🌐 Welcome to Web4App.io'),
-        e('p', null, 'This is a lightweight React app powered by .min.js files.')
+    const App = () =>
+      e('div', { style: { textAlign: 'center', paddingTop: '50px', fontFamily: 'sans-serif' } },
+        e('h1', null, '🌍 Welcome to Web4App.io'),
+        e('p', null, 'Decentralized AI + React UI via .min.js')
       );
-    };
 
     ReactDOM.createRoot(document.getElementById('root')).render(e(App));
   </script>
