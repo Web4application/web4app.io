@@ -157,7 +157,7 @@ curl -SL https://github.com/docker/compose/releases/download/v2.37.3/docker-comp
  php yii migrate-rbac
  php yii migrate
 
- cp .env.web4app.io .env
+ cp .env.web4app .env
 
 npm install --save-dev @commitlint/config-conventional @commitlint/cli
 echo "export default {extends: ['@commitlint/config-conventional']};" > commitlint.config.js
@@ -179,3 +179,7 @@ curl http://localhost:8080/api/hello
 curl http://localhost:8080/api/time
 curl -X POST http://localhost:8080/api/echo -d '{"text":"Web4 is here!"}' -H "Content-Type: application/json"
 curl http://localhost:8080/api/status
+
+git add .
+git commit -m "Added files from phone"
+git push origin main
