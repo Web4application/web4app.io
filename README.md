@@ -29,7 +29,7 @@ web4app_fullstack/
 go run main.go
 ```
 
-Then visit: [http://localhost:8080](http://localhost:8080)
+Then visit: [http://localhost.com](http://172.20.10.6:50080)
 
 ## 🧪 Try the Endpoints
 
