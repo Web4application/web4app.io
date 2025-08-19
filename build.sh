@@ -56,3 +56,4 @@ SECRET ENV CYPRESS_RECORD_KEY
 # execute the tests against the same machine (?) on N machines
 SPLIT UNORDERED 3
 RUN npx cypress run --record --parallel --ci-build-id $JOB_ID-$RETRY_INDEX
+
