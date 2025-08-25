@@ -1,4 +1,4 @@
-package discordgo
+package web4app
 
 // Webhook stores the data for a webhook.
 type Webhook struct {
