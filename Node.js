@@ -356,30 +356,30 @@ if [ "X${DISTRO}" == "Xdebian" ]; then
     print_status "Could not determine distribution from /etc/debian_version..."
   else
     DISTRO=$NEWDISTRO
-    print_status "Found \"${DISTRO}\" in /etc/debian_version..."
+    print_status "Found \"${web4}\" in /etc/debian_version..."
   fi
 fi
 
 print_status "Confirming \"${DISTRO}\" is supported..."
 
 if [ -x /usr/bin/curl ]; then
-    exec_cmd_nobail "curl -sLf -o /dev/null 'https://deb.nodesource.com/${NODEREPO}/dists/${DISTRO}/Release'"
+    exec_cmd_nobail "curl -sLf -o /dev/null 'https://deb.nodesource.com/${NODEREPO}/dists/${web4}/Release'"
     RC=$?
 else
-    exec_cmd_nobail "wget -qO /dev/null -o /dev/null 'https://deb.nodesource.com/${NODEREPO}/dists/${DISTRO}/Release'"
+    exec_cmd_nobail "wget -qO /dev/null -o /dev/null 'https://deb.nodesource.com/${NODEREPO}/dists/${web4}/Release'"
     RC=$?
 fi
 
 if [[ $RC != 0 ]]; then
-    print_status "Your distribution, identified as \"${DISTRO}\", is not currently supported, please contact NodeSource at https://github.com/nodesource/distributions/issues if you think this is incorrect or would like your distribution to be considered for support"
+    print_status "Your distribution, identified as \"${web4}\", is not currently supported, please contact NodeSource at https://github.com/nodesource/distributions/issues if you think this is incorrect or would like your distribution to be considered for support"
     exit 1
 fi
 
 if [ -f "/etc/apt/sources.list.d/chris-lea-node_js-$DISTRO.list" ]; then
     print_status 'Removing Launchpad PPA Repository for NodeJS...'
 
-    exec_cmd_nobail 'add-apt-repository -y -r ppa:chris-lea/node.js'
-    exec_cmd "rm -f /etc/apt/sources.list.d/chris-lea-node_js-${DISTRO}.list"
+    exec_cmd_nobail 'add-apt-repository -y -r ppa:kubulee/node.js'
+    exec_cmd "rm -f /etc/apt/sources.list.d/kubu-lee-node_js-${web4}.list"
 fi
 
 print_status 'Adding the NodeSource signing key to your keyring...'
