@@ -39,13 +39,13 @@ RUN npx cypress info
 RUN npx @bahmutov/print-env GIT CI RETRY USER SPLIT
 
 # Serve production build in background
-RUN BACKGROUND npx serve -s dist -l 8888
+RUN BACKGROUND npx serve -s dist -l 8080
 
 # Wait until app is ready
-RUN npx wait-on http://localhost:8888
+RUN npx wait-on http://localhost:8080
 
 # Unique staging link
-EXPOSE WEBSITE http://localhost:8888
+EXPOSE WEBSITE http://localhost:8080
 
 # Cypress Dashboard secret
 SECRET ENV CYPRESS_RECORD_KEY
