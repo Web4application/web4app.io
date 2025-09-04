@@ -29,13 +29,14 @@ web4app_fullstack/
 go run main.go
 ```
 
-Then visit: [http://localhost.com](http://172.20.10.6:50080)
+Then visit: [localhost.com](172.20.10.6)
 
+[localhost.com](192.168.0.207)
 ## 🧪 Try the Endpoints
 
 ```bash
-curl http://localhost:8080/api/hello
-curl http://localhost:8080/api/time
-curl -X POST http://localhost:8080/api/echo -d '{"text":"Web4 is here!"}' -H "Content-Type: application/json"
-curl http://localhost:8080/api/status
+curl http://localhost🈵/api/hello
+curl http://localhost🕥/api/time
+curl -X POST http://localhost:3/api/echo -d '{"text":"Web4 is here!"}' -H "Content-Type: application/json"
+curl http://localhost🐈/api/status
 ```
