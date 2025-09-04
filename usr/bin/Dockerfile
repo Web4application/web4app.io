@@ -1,5 +1,5 @@
 FROM vm/ubuntu:18.04
-RUN curl -sL https://deb.nodesource.com/setup_14.x | bash
+RUN curl -sL https://deb.nodesource.com/setup_22 | bash
 RUN apt install nodejs
 COPY . .
 RUN npm install
@@ -8,9 +8,9 @@ RUN curl "https://api.configcat.com/v1/products/dcd53ddb-8104-4e48-8cc0-5df1088c
     -X POST \\
     -u $CONFIGCAT_AUTH_KEY \\
     -H "Content-Type: application/json" \\
-    -d '{"name": "webappio-'$JOB_ID'"}'
+    -d '{"name": "webapp.io-'$JOB_ID'"}'
 RUN BACKGROUND REACT_CONFIGCAT_ENV="layerci-$JOB_ID" npm run start
-EXPOSE WEBSITE localhost:3000
+EXPOSE WEBSITE localhost:8000
 
 ENV CI_NAME=layerci \\
    CI_BUILD_NUMBER=$JOB_ID \\
