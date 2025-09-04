@@ -29,9 +29,9 @@ web4app_fullstack/
 go run main.go
 ```
 
-Then visit: [localhost](172.20.10.6)
+Then visit: [api.web4.com](172.20.10.6)
 
-[localhost.com](192.168.0.207)
+[web4app.io](192.168.0.207:index.html)
 ## 🧪 Try the Endpoints
 
 ```bash
