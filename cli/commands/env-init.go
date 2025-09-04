@@ -6,8 +6,8 @@ module.exports = function envInit(targetDir = process.cwd()) {
   const envPyPath = path.join(targetDir, '.env.py');
   const configPyPath = path.join(targetDir, 'config.py');
 
-  const envContent = `API_URL=https://api.example.com\nDEBUG=True\nPROJECT_NAME=Web4App\n`;
-  const envPyContent = `API_URL = "https://api.example.com"\nDEBUG = True\nPROJECT_NAME = "Web4App"\n`;
+  const envContent = `API_URL=https://api.web4app.com\nDEBUG=True\nPROJECT_NAME=Web4App\n`;
+  const envPyContent = `API_URL = "https://api.web4app.com"\nDEBUG = True\nPROJECT_NAME = "Web4App"\n`;
   const configContent = `
 import os
 from dotenv import load_dotenv
@@ -21,7 +21,7 @@ except ImportError:
 
 API_URL = os.getenv("API_URL") or getattr(pyenv, "API_URL", "http://localhost")
 DEBUG = (os.getenv("DEBUG") or str(getattr(pyenv, "DEBUG", False))) == "True"
-PROJECT_NAME = os.getenv("PROJECT_NAME") or getattr(pyenv, "PROJECT_NAME", "UnnamedApp")
+PROJECT_NAME = os.getenv("PROJECT_NAME") or getattr(pyenv, "PROJECT_NAME", "web4app")
 `.trimStart();
 
   fs.writeFileSync(envPath, envContent);
