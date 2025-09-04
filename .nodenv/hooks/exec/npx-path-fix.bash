@@ -1,7 +1,6 @@
+# ~/.nodenv/hooks/exec/npx-path-fix.bash
 # If npx is being executed, remove nodenv's shims from PATH
-# such that npx won't find the shims for executables that
-# only exist in non-active nodes.
-# This ensures npx can install the necessary package on-demand.
+# so npx won’t pick up shims for non-active node versions.
 
 [ "$NODENV_COMMAND" = npx ] || return 0
 
