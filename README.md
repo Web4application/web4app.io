@@ -35,8 +35,8 @@ Then visit: [localhost](172.20.10.6)
 ## 🧪 Try the Endpoints
 
 ```bash
-curl http://localhost🈵/api/hello
-curl http://localhost🕥/api/time
-curl -X POST http://localhost:3/api/echo -d '{"text":"Web4 is here!"}' -H "Content-Type: application/json"
-curl http://localhost🐈/api/status
+curl http://localhost/api/hello
+curl http://localhost/api/time
+curl -X POST http://localhost/api/echo -d '{"text":"Web4 is here!"}' -H "Content-Type: application/json"
+curl http://localhost.com/api/status
 ```
