@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { io } from "socket.io-client";
 import './ChatRoom.css';
 
-const socket = io("http://localhost:4000");
+const socket = io("http://localhost:5000");
 
 const ChatRoom = () => {
   const { id } = useParams();
