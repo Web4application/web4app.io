@@ -3,15 +3,15 @@ project(nodenv-realpath-lib VERSION 1.0.0 LANGUAGES C)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-# Honor BUILD_SHARED_LIBS (default: shared if ON, static if OFF)
+# Library (honors BUILD_SHARED_LIBS)
 add_library(nodenv_realpath src/realpath.c)
 
 # Namespaced alias for consumers
 add_library(nodenv::realpath ALIAS nodenv_realpath)
 
 set_target_properties(nodenv_realpath PROPERTIES
-    PREFIX ""                      # no 'lib' prefix
-    OUTPUT_NAME "nodenv-realpath"  # final artifact name
+    PREFIX ""
+    OUTPUT_NAME "nodenv-realpath"
 )
 
 target_compile_options(nodenv_realpath PRIVATE -Wall -O2)
@@ -21,21 +21,40 @@ target_include_directories(nodenv_realpath PUBLIC
     $<INSTALL_INTERFACE:include>
 )
 
-# Install library into libexec (static or shared)
+# --- Detect common system libraries ---
+set(NODENV_REALPATH_PRIVATE_LIBS "")
+
+find_package(Threads REQUIRED)
+list(APPEND NODENV_REALPATH_PRIVATE_LIBS ${CMAKE_THREAD_LIBS_INIT})
+
+find_library(MATH_LIB m)
+if(MATH_LIB)
+    list(APPEND NODENV_REALPATH_PRIVATE_LIBS -lm)
+endif()
+
+find_library(DL_LIB dl)
+if(DL_LIB)
+    list(APPEND NODENV_REALPATH_PRIVATE_LIBS -ldl)
+endif()
+
+# Flatten
+string(JOIN " " PRIVATE_LIBS ${NODENV_REALPATH_PRIVATE_LIBS})
+
+# Link into target so build succeeds
+target_link_libraries(nodenv_realpath PRIVATE ${NODENV_REALPATH_PRIVATE_LIBS})
+
+# --- Install rules ---
 install(TARGETS nodenv_realpath
     EXPORT nodenv-realpath-libTargets
-    LIBRARY DESTINATION libexec    # .so / .dylib
-    RUNTIME DESTINATION libexec    # Windows .dll
-    ARCHIVE DESTINATION libexec    # .a
+    LIBRARY DESTINATION libexec
+    RUNTIME DESTINATION libexec
+    ARCHIVE DESTINATION libexec
 )
 
-# Install headers
 install(DIRECTORY include/ DESTINATION include
         FILES_MATCHING PATTERN "*.h")
 
 # --- pkg-config support ---
-set(PKGCONFIG_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig")
-
 configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/nodenv-realpath.pc.in
     ${CMAKE_CURRENT_BINARY_DIR}/nodenv-realpath.pc
