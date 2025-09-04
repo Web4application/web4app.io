@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 set -e
 
 if [ "$1" = "--debug" ]; then
@@ -183,3 +184,12 @@ curl http://localhost:8080/api/status
 git add .
 git commit -m "Added files from phone"
 git push origin main
+
+cmake -S . -B build -DCMAKE_INSTALL_PREFIX=/usr/local -DBUILD_SHARED_LIBS=ON
+cmake --build build
+sudo cmake --install build
+cmake -S . -B build -DCMAKE_INSTALL_PREFIX=/usr/local -DBUILD_SHARED_LIBS=OFF
+cmake --build build
+sudo cmake --install build
+
+
