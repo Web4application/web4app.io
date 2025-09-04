@@ -2,13 +2,13 @@
   <div id="app">
     <!-- Navbar -->
     <header class="navbar">
-      <div class="logo">Web4App</div>
+      <div class="logo">Web4</div>
       <nav>
         <ul>
           <li><a href="#features">Features</a></li>
           <li><a href="#solutions">Solutions</a></li>
           <li><a href="#about">About</a></li>
-          <li><a href="https://app.web4app.io" target="_blank" class="cta-button">Launch</a></li>
+          <li><a href="https://app.web4app.com" target="_blank" class="cta-button">Launch</a></li>
         </ul>
       </nav>
     </header>
@@ -17,7 +17,7 @@
     <section class="hero">
       <h1>Where AI Meets the Future of the Web</h1>
       <p>Empowering decentralized intelligence for the Web4 generation. Fast. Secure. Unstoppable.</p>
-      <a href="https://app.web4app.io" target="_blank" class="cta-button">Launch Web4App</a>
+      <a href="https://app.web4app.com" target="_blank" class="cta-button">Launch Web4App</a>
     </section>
 
     <!-- Features -->
@@ -97,7 +97,7 @@ export default {
       this.scrollToBottom();
 
       try {
-        const res = await fetch('https://api.web4app.io/lola-chat', {
+        const res = await fetch('https://api.web4app.com/lola-chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ prompt })
