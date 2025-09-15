@@ -1,1 +1,1 @@
-sudo unzip ~/Downloads/ngrok-v3-stable-darwin-arm64.zip -d /usr/local/bin
+ngrok config add-authtoken 32ilv47hpwZq1USFAL92IHxsPvy_47shDYUjqyFaF6BnPKp79
