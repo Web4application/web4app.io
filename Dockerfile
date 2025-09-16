@@ -75,3 +75,17 @@ RUN BACKGROUND docker-compose up
 EXPOSE WEBSITE localhost:8000
 
 RUN npm run broswerstack https://$DEPLOYMENT_HOST
+
+FROM webapp.io/nodejs
+
+WORKDIR /app
+
+COPY . .
+
+RUN npm install
+
+RUN BACKGROUND npm run serve
+
+EXPOSE WEBSITE localhost:8000
+
+RUN npm run broswerstack https://$DEPLOYMENT_HOST
