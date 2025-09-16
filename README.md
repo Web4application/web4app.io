@@ -31,7 +31,7 @@ go run main.go
 
 Then visit: [web4app](index.html)
 
-[web4app.io](index.html)
+[web4app.io](index)
 ## 🧪 Try the Endpoints
 
 ```bash
