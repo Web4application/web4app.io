@@ -21,7 +21,7 @@ COPY --from=builder /app/web4app .
 COPY static ./static
 
 EXPOSE 8080
-ENV PORT=8080
+ENV PORT=3000
 CMD ["./web4app"]
 
 FROM vm/ubuntu:18.04
@@ -47,3 +47,17 @@ ENV CI_NAME=layerci \\
 SECRET ENV COVERALLS_REPO_TOKEN
 
 RUN (the test command)
+
+FROM webapp.io/docker
+2
+WORKDIR /app
+3
+COPY . .
+4
+RUN docker build -t image .
+5
+RUN BACKGROUND docker run -p 8000:8000 image
+6
+EXPOSE WEBSITE localhost:8000
+7
+RUN npm run reflect-run https://$DEPLOYMENT_HOST
