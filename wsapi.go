@@ -1,6 +1,6 @@
- websocket interface.
+websocket interface.
 
-package web4app.
+package web4app.io
 
 import (
 	"bytes"
