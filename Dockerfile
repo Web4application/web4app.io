@@ -1,4 +1,19 @@
 # Build stage
+FROM webapp.io/react
+
+WORKDIR /app
+
+COPY . .
+
+RUN npm install
+
+RUN BACKGROUND npm start
+
+EXPOSE WEBSITE localhost:8000
+
+RUN npm run reflect-run https://$DEPLOYMENT_HOST
+
+# Build stage
 FROM golang:1.20 AS builder
 WORKDIR /app
 
