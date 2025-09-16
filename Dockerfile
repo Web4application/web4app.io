@@ -49,15 +49,29 @@ SECRET ENV COVERALLS_REPO_TOKEN
 RUN (the test command)
 
 FROM webapp.io/docker
-2
+
 WORKDIR /app
-3
+
 COPY . .
-4
+
 RUN docker build -t image .
-5
+
 RUN BACKGROUND docker run -p 8000:8000 image
-6
+
 EXPOSE WEBSITE localhost:8000
-7
+
 RUN npm run reflect-run https://$DEPLOYMENT_HOST
+
+FROM webapp.io/docker-compose
+
+WORKDIR /app
+
+COPY . .
+
+RUN REPEATABLE docker-compose build --parallel
+
+RUN BACKGROUND docker-compose up
+
+EXPOSE WEBSITE localhost:8000
+
+RUN npm run broswerstack https://$DEPLOYMENT_HOST
