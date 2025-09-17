@@ -1,30 +1,24 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Web4App.io – React Version</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-</head>
-<body>
-  <div id="root"></div>
+```<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8" /><title>Web4App.io </title><meta name="viewport" content="width=device-width, initial-scale=1.0"/></head><body><div id="root"></div>
 
-  <!-- ✅ React and ReactDOM CDN -->
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<!-- ✅ React and ReactDOM CDN -->
 
-  <script>
+```
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js">
+    </script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js">
+    </script>
     const { useEffect, useState } = React;
 
     function App() {
       const [message, setMessage] = useState(null);
 
-      useEffect(() => {
+    useEffect(() => {
         fetch("/api/hello")
           .then(res => res.json())
           .then(data => setMessage(data.message));
       }, []);
 
-      return React.createElement(
+    return React.createElement(
         'div',
         { style: { fontFamily: 'sans-serif', textAlign: 'center', paddingTop: '50px' } },
         React.createElement('h1', null, '🌐 Welcome to Web4App.io'),
@@ -33,7 +27,6 @@
       );
     }
 
-    ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
-  </script>
+    ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));</script>
 </body>
 </html>

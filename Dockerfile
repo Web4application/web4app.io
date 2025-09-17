@@ -1,4 +1,19 @@
 # Build stage
+FROM webapp.io/react
+
+WORKDIR /app
+
+COPY . .
+
+RUN npm install
+
+RUN BACKGROUND npm start
+
+EXPOSE WEBSITE localhost:8000
+
+RUN npm run reflect-run https://$DEPLOYMENT_HOST
+
+# Build stage
 FROM golang:1.20 AS builder
 WORKDIR /app
 
@@ -21,7 +36,7 @@ COPY --from=builder /app/web4app .
 COPY static ./static
 
 EXPOSE 8080
-ENV PORT=8080
+ENV PORT=3000
 CMD ["./web4app"]
 
 FROM vm/ubuntu:18.04
@@ -47,3 +62,45 @@ ENV CI_NAME=layerci \\
 SECRET ENV COVERALLS_REPO_TOKEN
 
 RUN (the test command)
+
+FROM webapp.io/docker
+
+WORKDIR /app
+
+COPY . .
+
+RUN docker build -t image .
+
+RUN BACKGROUND docker run -p 8000:8000 image
+
+EXPOSE WEBSITE localhost:8000
+
+RUN npm run reflect-run https://$DEPLOYMENT_HOST
+
+FROM webapp.io/docker-compose
+
+WORKDIR /app
+
+COPY . .
+
+RUN REPEATABLE docker-compose build --parallel
+
+RUN BACKGROUND docker-compose up
+
+EXPOSE WEBSITE localhost:8000
+
+RUN npm run broswerstack https://$DEPLOYMENT_HOST
+
+FROM webapp.io/nodejs
+
+WORKDIR /app
+
+COPY . .
+
+RUN npm install
+
+RUN BACKGROUND npm run serve
+
+EXPOSE WEBSITE localhost:8000
+
+RUN npm run broswerstack https://$DEPLOYMENT_HOST
