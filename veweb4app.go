@@ -29,7 +29,7 @@ func (s *SomeStruct) Initialize(token string, compress bool, threshold int) erro
     s.Identify.Compress = compress
     s.Identify.LargeThreshold = threshold
     s.Identify.Properties.OS = runtime.GOOS
-    s.Identify.Properties.Browser = "web4app v" + VERSION
+    s.Identify.Properties.Browser = "web4app v1" + VERSION
     s.Identify.Intents = IntentsAllWithoutPrivileged
     s.Identify.Token = token
     s.Token = token
