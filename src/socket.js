@@ -1,4 +1,4 @@
 // src/socket.js
 import { io } from 'socket.io-client';
 
-export const socket = io('http://localhost:4000'); // your backend server URL
+export const socket = io('https://web4application.github.io/web4app.io/'); // your backend server URL
