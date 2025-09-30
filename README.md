@@ -1,4 +1,4 @@
-# Web4App Fullstack
+# Web4App.io Fullstack
 
 🚀 A simple full-stack starter kit using Go for the backend and vanilla HTML for the frontend.
 
