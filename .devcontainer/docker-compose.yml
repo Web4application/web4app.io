@@ -1,0 +1,17 @@
+version: "3.8"
+
+services:
+  dev:
+    build:
+      context: .
+      dockerfile: .devcontainer/Dockerfile
+    volumes:
+      - ..:/workspace:cached
+    command: sleep infinity
+    ports:
+      - "3000:3000" # web4app.io frontend
+      - "8000:8000" # aura backend
+      - "4000:4000" # kubuverse
+    environment:
+      - NODE_ENV=development
+      - PYTHONUNBUFFERED=1
