@@ -1,0 +1,27 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run Aura Backend",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/aura/main.py"
+    },
+    {
+      "name": "Run web4app.io Frontend",
+      "type": "pwa-node",
+      "request": "launch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "cwd": "${workspaceFolder}/web4app.io"
+    },
+    {
+      "name": "Run Kubuverse",
+      "type": "pwa-node",
+      "request": "launch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "cwd": "${workspaceFolder}/kubuverse"
+    }
+  ]
+}
