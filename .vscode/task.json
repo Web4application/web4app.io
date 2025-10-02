@@ -1,0 +1,27 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Install Dependencies",
+      "type": "shell",
+      "command": "npm install && pip install -r requirements.txt",
+      "problemMatcher": []
+    },
+    {
+      "label": "Build Web4App",
+      "type": "shell",
+      "command": "npm run build",
+      "options": {
+        "cwd": "${workspaceFolder}/web4app.io"
+      }
+    },
+    {
+      "label": "Build Kubuverse",
+      "type": "shell",
+      "command": "npm run build",
+      "options": {
+        "cwd": "${workspaceFolder}/kubuverse"
+      }
+    }
+  ]
+}
