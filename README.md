@@ -1,8 +1,6 @@
 ## DISCORD GO WEBSOCKET CLIENT FLOW DIAGRAM
 
-```xlsl
-
-
+```xlsl.sh
 +-------------------+                             +----------------------+
 |   Go Discord      |                             |   Discord Gateway    |
 |   Client (Session)|                             |                      |
