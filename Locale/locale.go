@@ -1,4 +1,4 @@
-package web4app.io
+package locale
 
 // Locale represents the accepted languages for web4app.
 type Locale string
