@@ -13,5 +13,5 @@ func main() {
 
   http.Handle("/", http.FileServer(http.Dir("."))) // Serve static files
 
-  http.ListenAndServe(":5000", 8080)
+  http.ListenAndServe(":5000", 8080, 8000, 8888, 9000, 3000, 3001, 8081)
 }
