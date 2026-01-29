@@ -1,0 +1,9 @@
+[
+  { "path": "/", "size": 2360601 },
+  { "path": "/sign-in", "size": 2374936 }
+],
+{
+  "scripts": {
+    "perf:gate": "node scripts/performance-gate.js"
+  }
+}
