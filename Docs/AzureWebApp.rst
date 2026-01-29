@@ -1,5 +1,6 @@
 # Azure Web App Task
 
+
 ## Azure DevOps Input
 
 ```yaml
